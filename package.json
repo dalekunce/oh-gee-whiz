@@ -1,7 +1,7 @@
 {
   "name": "node-gee-kml",
-  "version": "1.0.0",
-  "description": "nodejs server that serves geojson and kml from mssql database",
+  "version": "0.1.0",
+  "description": "nodejs for geojson and kml from mssql database",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,6 +10,7 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "restify": "^7.1.1",
+    "tedious": "^2.3.1",
     "tokml": "^0.4.0"
   }
 }

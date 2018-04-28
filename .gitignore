@@ -1,7 +1,7 @@
 # Custom #
 ###################
 node_modules
-config.js
+config.json
 .env
 sql
 

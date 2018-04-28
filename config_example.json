@@ -1,0 +1,11 @@
+{
+  "userName": "username",
+  "password": "simple1234",
+  "server": "localhost",
+  "options": {
+    "database": "databasename",
+    "debug": {
+      "packet": true
+    }
+  }
+}
