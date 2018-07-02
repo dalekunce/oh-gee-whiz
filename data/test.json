@@ -3,12 +3,43 @@
   "features": [
     {
       "type": "Feature",
-      "properties": {},
+      "id": 1,
+      "properties": {
+        "name": "Little Suzy"
+      },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          23.203125,
-          40.97989806962013
+          -110,
+          10
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 2,
+      "properties": {
+        "name": "Big Earl's"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90,
+          30
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3,
+      "properties": {
+        "name": "Medium Dan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100,
+          -24
         ]
       }
     }

@@ -1,11 +1,13 @@
 {
   "userName": "username",
-  "password": "simple1234",
+  "password": "password",
   "server": "localhost",
   "options": {
     "database": "databasename",
+    "rowCollectionOnRequestCompletion": true,
     "debug": {
       "packet": true
-    }
+    },
+    "parseJSON": true
   }
 }
