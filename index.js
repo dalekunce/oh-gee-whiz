@@ -109,8 +109,8 @@ function getSearch (req, res, next) {
     }).then(function (d) {
       let d4 = JSON.parse(d)
       let d5 = tokml(d4, {
-        documentName: 'Kimco Results',
-        documentDescription: 'Kimco Results',
+        documentName: 'Kimco Search Results',
+        documentDescription: 'Kimco Search Results',
         name: 'name'
       })
       return d5
