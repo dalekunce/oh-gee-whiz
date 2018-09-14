@@ -4,7 +4,7 @@ This application/api is a standalone node.js app that talks to a MSSQL database 
 
 ## Install Application
 
-Create a `config.json` file and update with your credentials and settings.
+Edit the credentials and settings in `config_examples.json` and save as `config.json` in the root directory of the application.
 
 ``` json
 {
@@ -15,10 +15,14 @@ Create a `config.json` file and update with your credentials and settings.
     "database": "[DBname]",
     "debug": {
       "packet": false
-    }
+    },
+    "parseJSON": true,
+    "encrypt": false
   }
 }
 ```
+
+## Install Dependencies
 
 ``` bash
 npm install

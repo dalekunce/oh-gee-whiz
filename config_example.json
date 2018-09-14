@@ -8,6 +8,7 @@
     "debug": {
       "packet": true
     },
-    "parseJSON": true
+    "parseJSON": true,
+    "encrypt": false
   }
 }
