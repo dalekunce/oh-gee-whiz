@@ -9,6 +9,13 @@ const testJSON = require('./data/test.json')
 
 tp.setConnectionConfig(config) // global scope
 
+/* Turn the server on */
+const server = restify.createServer()
+server.pre(restify.pre.sanitizePath())
+server.use(restify.plugins.acceptParser(server.acceptable))
+server.use(restify.plugins.queryParser())
+server.use(restify.plugins.bodyParser())
+
 /** SQL connection **/
 const Connection = require('tedious').Connection
 const Request = require('tedious').Request
@@ -23,7 +30,6 @@ connection.on('connect', function (err) {
     console.log('ERROR Connecting to ' + config.server)
   } else {
     console.log('Connected to ' + config.server + ' Started')
-    // connection.on('close', function () { })
   }
 })
 
@@ -54,8 +60,6 @@ function statusUpdate (req, res, next) {
 }
 
 function getKmlTest (req, res, next) {
-  // kml is a string of KML data, geojsonObject is a JavaScript object of
-  // GeoJSON data
   const kml = tokml(testJSON)
   res.set({
     'content-type': 'application/xml',
@@ -65,8 +69,10 @@ function getKmlTest (req, res, next) {
   next()
 }
 
+/** Search **/
+
 function getSearch (req, res, next) {
-  const qS = req.params.search
+  const qS = req.query.q
 
   console.log('search started for ' + qS)
 
@@ -128,12 +134,6 @@ function getSearch (req, res, next) {
 
   goSearch(qS)
 }
-
-/* Turn the server on */
-const server = restify.createServer()
-server.use(restify.plugins.acceptParser(server.acceptable))
-server.use(restify.plugins.queryParser())
-server.use(restify.plugins.bodyParser())
 
 /* Is the server up */
 server.get('/status', statusUpdate)
