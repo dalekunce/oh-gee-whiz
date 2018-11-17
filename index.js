@@ -3,9 +3,13 @@ const config = require('./config.json')
 const restify = require('restify')
 const tokml = require('tokml')
 var tp = require('tedious-promises')
+const _ = require('lodash')
+const Promise = require('promise')
+var fs = require('fs')
 
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
+const kimco = require('./data/kimco.json')
 
 tp.setConnectionConfig(config) // global scope
 
@@ -82,6 +86,10 @@ function getSearch (req, res, next) {
       SiteNo as id,
       Name as [properties.Name],
       SiteNo as [properties.SiteNo],
+      PropertyManager as [properties.PropertyManager],
+      LeasingAgent as [properties.LeasingAgent],
+      'medium' as [properties.marker-size],
+      '' as [properties.marker-symbol],
       'Point' as [geometry.type],
       JSON_QUERY
       ( FORMATMESSAGE('[%s,%s]',
@@ -90,6 +98,7 @@ function getSearch (req, res, next) {
     ) as [geometry.coordinates]
     FROM KIMprops
     WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
+    ORDER BY SiteNo
     FOR JSON PATH`)
     .parameter('qID', TYPES.VarChar, sT)
     .execute()
@@ -135,11 +144,136 @@ function getSearch (req, res, next) {
   goSearch(qS)
 }
 
+/** sorter for data **/
+
+function getSorted (req, res, next) {
+  const sortBy = req.query.s
+  let docName = {}
+  let style = {}
+
+  const e = function (s) {
+    console.log('SORTING')
+    // sort the layer for the intended
+    if (s === 'propman') {
+      docName = 'PropertyManager'
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'commercial',
+        'marker-color': '#008015'
+      }
+    } else if (s === 'lease') {
+      docName = 'LeasingAgent'
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'camera',
+        'marker-color': '#801876'
+      }
+    } else {
+      docName = 'KimcoSites'
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'star',
+        'marker-color': '#2C4880'
+      }
+    }
+
+    console.log(docName)
+
+    let kimcoS = kimco
+    console.log(kimcoS)
+
+    return new Promise((resolve, reject) => {
+      resolve(kimcoS)
+    })
+  }
+
+  const styleIt = function (q) {
+    console.log('STYLING')
+
+    return new Promise((resolve, reject) => {
+      _.forEach(q, function (element, i) {
+        _.assign(q[i].properties, style)
+      })
+      resolve(q)
+    })
+  }
+
+  const geofyIt = function (q) {
+    console.log('GEOFYING')
+    let q1 = {
+      type: "FeatureCollection",
+      "features":
+        eval(q)
+    }
+
+    console.log(q1)
+
+    console.log('done with the geo stuff')
+
+    return new Promise((resolve, reject) => {
+      let q2 = JSON.stringify(q1, null, 2)
+      resolve(q2)
+    })
+  }
+
+  const parseK = function (q3) {
+    console.log('PARSING')
+    let q4 = JSON.parse(q3)
+    let dKML = tokml(q4, {
+      documentName: 'Property Manager',
+      documentDescription: 'Property Manager',
+      simplestyle: true,
+      name: 'Name'
+    })
+
+    return new Promise((resolve, reject) => {
+      fs.writeFile('kimco.kml', dKML, function (err) {
+        if (err) {
+          return console.log(err)
+        } else {
+          console.log('The file was saved')
+        }
+      })
+      resolve(dKML)
+    })
+  }
+
+  // let we = Promise.all(
+  e(sortBy)
+  .then(function (result) {
+    let q = styleIt(result)
+    return q
+  })
+  .then(function (result) {
+    let q = geofyIt(result)
+    return q
+  }).then(function (result) {
+    let q = parseK(result)
+    return q
+  })
+  .then(function (f) {
+    res.set({
+      'content-type': 'application/xml',
+      'content-disposition': 'attachment; filename="sites.kml"'
+    })
+    res.send(f)
+    next()
+  })
+  // .catch((error) => {
+  //   console.error('Error:', error.toString())
+  // })
+
+  // we()
+}
+
 /* Is the server up */
 server.get('/status', statusUpdate)
 
 /** Get KML Test **/
 server.get('/test/kml', getKmlTest)
+
+/** Search **/
+server.get('/sort/:sort', getSorted)
 
 /** Search **/
 server.get('/search/:search', getSearch)
