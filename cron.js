@@ -89,7 +89,7 @@ const getData = function () {
   })
 }
 
-new CronJob('1 * * * * *', function () {
+new CronJob('* 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('Daily Get ' + logTime)
