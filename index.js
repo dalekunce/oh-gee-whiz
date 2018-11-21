@@ -110,7 +110,6 @@ const getSearch = function (req, res, next) {
     .parameter('qID', TYPES.VarChar, sT)
     .execute()
     .then(function (result, rowCount) {
-      console.log(result)
       let combined = ''
       // sql requires some parsing because mssql doesn't output clean geojson by default
       // const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
@@ -118,12 +117,10 @@ const getSearch = function (req, res, next) {
         _.forEach(result, function (element, i) {
           combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
         })
-        console.log(combined)
         combined = JSON.parse(combined)
         resolve(combined)
       })
     }).then(function (q) {
-      console.log('DESCRIPTING')
       return new Promise((resolve, reject) => {
         _.forEach(q, function (element, i) {
           // set description for later use by tokml
@@ -155,10 +152,7 @@ const getSearch = function (req, res, next) {
           }
 
           _.assign(q[i].properties, description)
-
-          // console.log(q[i])
         })
-        console.log(q)
         resolve(q)
       })
     }).then(function (d) {
@@ -175,14 +169,19 @@ const getSearch = function (req, res, next) {
         resolve(d)
       })
     }).then(function (d) {
-      let d4 = JSON.parse(d)
-      let d5 = tokml(d4, {
-        documentName: 'Kimco Search Results',
-        documentDescription: 'Kimco Search Results',
+      let q = {
+        type: 'FeatureCollection',
+        'features':
+        eval(d)
+      }
+      let d1 = tokml(q, {
+        documentName: 'Search Results for ' + qS,
+        documentDescription: 'Search Results for ' + qS,
         description: 'Description',
+        simplestyle: true,
         name: 'Name'
       })
-      return d5
+      return d1
     }).then(function (f) {
       res.set({
         'content-type': 'application/xml',
@@ -253,8 +252,6 @@ function getSorted (req, res, next) {
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
-        // console.log('feature ' + i)
-        // console.log(q[i].properties)
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
@@ -356,13 +353,13 @@ function getSorted (req, res, next) {
   })
 }
 
-/* Is the server up */
+/* Is the server up? */
 server.get('/status', statusUpdate)
 
 /** Get KML Test **/
 server.get('/test/kml', getKmlTest)
 
-/** Search **/
+/** KML NetworkLink for Leasing Agents and Property Managers **/
 server.get('/sort/:sort', getSorted)
 
 /** Search **/
