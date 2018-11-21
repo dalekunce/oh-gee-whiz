@@ -2,10 +2,14 @@
 const config = require('./config.json')
 const restify = require('restify')
 const tokml = require('tokml')
-var tp = require('tedious-promises')
+const tp = require('tedious-promises')
+const _ = require('lodash')
+const Promise = require('promise')
+const fs = require('fs')
 
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
+const kimco = require('./data/kimco.json')
 
 tp.setConnectionConfig(config) // global scope
 
@@ -35,7 +39,7 @@ connection.on('connect', function (err) {
 
 /** Utilities **/
 
-function statusUpdate (req, res, next) {
+const statusUpdate = function (req, res, next) {
   result.serverstatus = 'API reporting for duty'
   res.set({
     'content-type': 'application/json'
@@ -59,7 +63,7 @@ function statusUpdate (req, res, next) {
   next()
 }
 
-function getKmlTest (req, res, next) {
+const getKmlTest = function (req, res, next) {
   const kml = tokml(testJSON)
   res.set({
     'content-type': 'application/xml',
@@ -70,18 +74,30 @@ function getKmlTest (req, res, next) {
 }
 
 /** Search **/
-
-function getSearch (req, res, next) {
-  const qS = req.query.q
+const getSearch = function (req, res, next) {
+  let qS = req.query.q
 
   console.log('search started for ' + qS)
 
-  function goSearch (sT) {
-    tp.sql(`SELECT TOP (3)
+  const goSearch = function (sT) {
+    tp.sql(`SELECT
       'Feature' AS type,
       SiteNo as id,
+      LeasingAgent as LeasingAgent,
+      PropertyManager as PropertyManager,
       Name as [properties.Name],
       SiteNo as [properties.SiteNo],
+      PropertyManager as [properties.PropertyManager],
+      LeasingAgent as [properties.LeasingAgent],
+      CenterName as [properties.CenterName],
+      Region as [properties.Region],
+      Address as [properties.Address],
+      GLA as [properties.GLA],
+      Partnership as [properties.Partnership],
+      MarketingBrochure as [properties.MarketingBrochure],
+      LinkToWebsite as [properties.LinkToWebsite],
+      LinkToOverlay as [properties.LinkToOverlay],
+      Participation as [properties.Participation],
       'Point' as [geometry.type],
       JSON_QUERY
       ( FORMATMESSAGE('[%s,%s]',
@@ -95,35 +111,82 @@ function getSearch (req, res, next) {
     .execute()
     .then(function (result, rowCount) {
       console.log(result)
-      if (rowCount < 1) {
-        console.log('returned ' + rowCount + ' features')
-        console.log('Not a Valid Search Term')
-        next()
-      } else {
-        // sql requires some parsing because mssql doesn't output clean geojson by default
-        const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
-        let d1 = {
-          type: "FeatureCollection",
-          "features":
-            eval(features)
-        }
+      let combined = ''
+      // sql requires some parsing because mssql doesn't output clean geojson by default
+      // const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
+      return new Promise((resolve, reject) => {
+        _.forEach(result, function (element, i) {
+          combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
+        })
+        console.log(combined)
+        combined = JSON.parse(combined)
+        resolve(combined)
+      })
+    }).then(function (q) {
+      console.log('DESCRIPTING')
+      return new Promise((resolve, reject) => {
+        _.forEach(q, function (element, i) {
+          // set description for later use by tokml
+          let desc = '<![CDATA[<!DOCTYPE html>' +
+            '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
+            '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
+            '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+            '<br /><br />' +
+            '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
+            '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
+            '<b>Address:</b>' + q[i].properties.Address + '<br />' +
+            '<b>Region:</b>' + q[i].properties.Region + '<br />' +
+            '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
+            '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+            '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
+            '<hr />' +
+            '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+            '<hr />' +
+            '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
+            '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
+            '<hr /><br />' +
+            '</font>' +
+            '</body>' +
+            '</html>]]>'
 
-        let d2 = JSON.stringify(d1, null, 2)
+          let description = {
+            'Description': desc
+          }
 
-        return d2
+          _.assign(q[i].properties, description)
+
+          // console.log(q[i])
+        })
+        console.log(q)
+        resolve(q)
+      })
+    }).then(function (d) {
+      let style = {
+        'marker-size': 'large',
+        'marker-symbol': 'circle',
+        'marker-color': '#FC6363'
       }
+
+      return new Promise((resolve, reject) => {
+        _.forEach(d, function (element, i) {
+          _.assign(d[i].properties, style)
+        })
+        resolve(d)
+      })
     }).then(function (d) {
       let d4 = JSON.parse(d)
       let d5 = tokml(d4, {
         documentName: 'Kimco Search Results',
         documentDescription: 'Kimco Search Results',
-        name: 'name'
+        description: 'Description',
+        name: 'Name'
       })
       return d5
     }).then(function (f) {
       res.set({
         'content-type': 'application/xml',
-        'content-disposition': 'attachment; filename="sites.kml"'
+        'content-disposition': 'attachment; filename="' + qS + '.kml"'
       })
       res.send(f)
       next()
@@ -135,11 +198,172 @@ function getSearch (req, res, next) {
   goSearch(qS)
 }
 
+/** sorter for data **/
+let sB = {}
+function getSorted (req, res, next) {
+  sB = req.query.s
+  let style = {}
+
+  const e = function (s) {
+    console.log('SORTING')
+    // sort the layer for the intended
+    if (s === 'PropertyManager') {
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'commercial',
+        'marker-color': '#008015'
+      }
+    } else if (s === 'LeasingAgent') {
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'camera',
+        'marker-color': '#801876'
+      }
+    } else {
+      style = {
+        'marker-size': 'large',
+        'marker-symbol': 'star',
+        'marker-color': '#2C4880'
+      }
+    }
+
+    console.log(sB)
+
+    // let kimcoS = kimco
+
+    return new Promise((resolve, reject) => {
+      let kimcoS = _.sortBy(kimco, sB)
+
+      resolve(kimcoS)
+    })
+  }
+
+  const styleIt = function (q) {
+    // console.log('STYLING')
+    return new Promise((resolve, reject) => {
+      _.forEach(q, function (element, i) {
+        _.assign(q[i].properties, style)
+      })
+      resolve(q)
+    })
+  }
+
+  const descriptIt = function (q) {
+    // console.log('DESCRIPTING')
+    return new Promise((resolve, reject) => {
+      _.forEach(q, function (element, i) {
+        // set description for later use by tokml
+        // console.log('feature ' + i)
+        // console.log(q[i].properties)
+        let desc = '<![CDATA[<!DOCTYPE html>' +
+          '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
+          '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
+          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+          '<br /><br />' +
+          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+          '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
+          '<hr />' +
+          '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+          '<hr />' +
+          '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
+          '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
+          '<hr /><br />' +
+          '</font>' +
+          '</body>' +
+          '</html>]]>'
+
+        let description = {
+          'Description': desc
+        }
+
+        _.assign(q[i].properties, description)
+      })
+
+      resolve(q)
+    })
+  }
+
+  const geofyIt = function (q) {
+    // console.log('GEOFYING')
+    let q1 = {
+      type: 'FeatureCollection',
+      'features':
+      eval(q)
+    }
+
+    return new Promise((resolve, reject) => {
+      let q2 = JSON.stringify(q1, null, 2)
+      resolve(q2)
+    })
+  }
+
+  const parseK = function (q3) {
+    // console.log('PARSING')
+    let q4 = JSON.parse(q3)
+    let dKML = tokml(q4, {
+      documentName: 'Kimco ' + sB,
+      documentDescription: 'Kimco ' + sB,
+      simplestyle: true,
+      description: 'Description',
+      name: sB
+    })
+
+    return new Promise((resolve, reject) => {
+      fs.writeFile('./data/' + sB + '.kml', dKML, function (err) {
+        if (err) {
+          return console.log(err)
+        } else {
+          console.log('The file was saved')
+        }
+      })
+      resolve(dKML)
+    })
+  }
+
+  // let we = Promise.all(
+  e(sB)
+  .then(function (result) {
+    let q = styleIt(result)
+    return q
+  })
+  .then(function (result) {
+    let q = descriptIt(result)
+    return q
+  })
+  .then(function (result) {
+    let q = geofyIt(result)
+    return q
+  }).then(function (result) {
+    let q = parseK(result)
+    return q
+  })
+  .then(function (f) {
+    res.set({
+      'content-type': 'application/xml',
+      'content-disposition': 'attachment; filename="' + sB + '.kml"'
+    })
+    res.send(f)
+    next()
+  })
+  .catch((error) => {
+    console.error('Error:', error.toString())
+  })
+}
+
 /* Is the server up */
 server.get('/status', statusUpdate)
 
 /** Get KML Test **/
 server.get('/test/kml', getKmlTest)
+
+/** Search **/
+server.get('/sort/:sort', getSorted)
 
 /** Search **/
 server.get('/search/:search', getSearch)
