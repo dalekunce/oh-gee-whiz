@@ -2,10 +2,10 @@
 const config = require('./config.json')
 const restify = require('restify')
 const tokml = require('tokml')
-var tp = require('tedious-promises')
+const tp = require('tedious-promises')
 const _ = require('lodash')
 const Promise = require('promise')
-var fs = require('fs')
+const fs = require('fs')
 
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
@@ -77,76 +77,113 @@ function getKmlTest (req, res, next) {
 const getSearch = function (req, res, next) {
   let qS = req.query.q
 
-  let qO = {}
-  if (req.query.s) {
-    qO = req.query.s
-  } else {
-    qO = ''
-  }
-
   console.log('search started for ' + qS)
 
-  function goSearch (sT, sO) {
-    tp.sql(`SELECT TOP (10)
-    'Feature' AS type,
-    SiteNo as id,
-    LeasingAgent as LeasingAgent,
-    PropertyManager as PropertyManager,
-    Name as [properties.Name],
-    SiteNo as [properties.SiteNo],
-    PropertyManager as [properties.PropertyManager],
-    LeasingAgent as [properties.LeasingAgent],
-    'Point' as [geometry.type],
-    JSON_QUERY
-    ( FORMATMESSAGE('[%s,%s]',
-    FORMAT(longitude, N'0.##########'),
-    FORMAT(latitude, N'0.##########'))
-  ) as [geometry.coordinates]
-  FROM KIMprops
-  WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
-  FOR JSON PATH`)
-  .parameter('qID', TYPES.VarChar, sT)
-  .execute()
-  .then(function (result, rowCount) {
-    console.log(result)
-    if (rowCount < 1) {
-      console.log('returned ' + rowCount + ' features')
-      console.log('Not a Valid Search Term')
-      next()
-    } else {
+  const goSearch = function (sT) {
+    tp.sql(`SELECT
+      'Feature' AS type,
+      SiteNo as id,
+      LeasingAgent as LeasingAgent,
+      PropertyManager as PropertyManager,
+      Name as [properties.Name],
+      SiteNo as [properties.SiteNo],
+      PropertyManager as [properties.PropertyManager],
+      LeasingAgent as [properties.LeasingAgent],
+      CenterName as [properties.CenterName],
+      Region as [properties.Region],
+      Address as [properties.Address],
+      GLA as [properties.GLA],
+      Partnership as [properties.Partnership],
+      MarketingBrochure as [properties.MarketingBrochure],
+      LinkToWebsite as [properties.LinkToWebsite],
+      LinkToOverlay as [properties.LinkToOverlay],
+      Participation as [properties.Participation],
+      'Point' as [geometry.type],
+      JSON_QUERY
+      ( FORMATMESSAGE('[%s,%s]',
+      FORMAT(longitude, N'0.##########'),
+      FORMAT(latitude, N'0.##########'))
+    ) as [geometry.coordinates]
+    FROM KIMprops
+    FOR JSON PATH`)
+    .parameter('qID', TYPES.VarChar, sT)
+    .execute()
+    .then(function (result, rowCount) {
+      console.log(result)
+      let combined = ''
       // sql requires some parsing because mssql doesn't output clean geojson by default
-      const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
-      let d1 = {
-        type: 'FeatureCollection',
-        'features':
-        eval(features)
-      }
+      // const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
+      return new Promise((resolve, reject) => {
+        _.forEach(result, function (element, i) {
+          combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
+        })
+        console.log(combined)
+        combined = JSON.parse(combined)
+        resolve(combined)
+      })
+    }).then(function (q) {
+      console.log('DESCRIPTING')
+      return new Promise((resolve, reject) => {
+        _.forEach(q, function (element, i) {
+          // set description for later use by tokml
+          console.log('feature ' + i)
+          console.log(q[i].properties)
+          let desc = '<![CDATA[<!DOCTYPE html>' +
+            '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
+            '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
+            '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+            '<br /><br />' +
+            '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
+            '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
+            '<b>Address:</b>' + q[i].properties.Address + '<br />' +
+            '<b>Region:</b>' + q[i].properties.Region + '<br />' +
+            '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
+            '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebs + '</a>' +
+            '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
+            '<hr />' +
+            '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+            '<hr />' +
+            '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
+            '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
+            '<hr /><br />' +
+            '</font>' +
+            '</body>' +
+            '</html>]]>'
 
-      let d2 = JSON.stringify(d1, null, 2)
+          let description = {
+            'Description': desc
+          }
 
-      return d2
-    }
-  }).then(function (d) {
-    let d4 = JSON.parse(d)
-    let d5 = tokml(d4, {
-      documentName: 'Kimco Search Results',
-      documentDescription: 'Kimco Search Results',
-      name: 'name'
+          _.assign(q[i].properties, description)
+
+          // console.log(q[i])
+        })
+        console.log(q)
+        resolve(q)
+      })
+    }).then(function (d) {
+      let d4 = JSON.parse(d)
+      let d5 = tokml(d4, {
+        documentName: 'Kimco Search Results',
+        documentDescription: 'Kimco Search Results',
+        description: 'Description',
+        name: 'Name'
+      })
+      return d5
+    }).then(function (f) {
+      res.set({
+        'content-type': 'application/xml',
+        'content-disposition': 'attachment; filename="sites.kml"'
+      })
+      res.send(f)
+      next()
+    }).fail(function (err) {
+      console.log(err)
     })
-    return d5
-  }).then(function (f) {
-    res.set({
-      'content-type': 'application/xml',
-      'content-disposition': 'attachment; filename="sites.kml"'
-    })
-    res.send(f)
-    next()
-  }).fail(function (err) {
-    console.log(err)
-  })
-}
+  }
 
-goSearch(qS, qO)
+  goSearch(qS)
 }
 
 /** sorter for data **/
@@ -199,6 +236,49 @@ function getSorted (req, res, next) {
     })
   }
 
+  const descriptIt = function (q) {
+    console.log('DESCRIPTING')
+    return new Promise((resolve, reject) => {
+      _.forEach(q, function (element, i) {
+        // set description for later use by tokml
+        console.log('feature ' + i)
+        console.log(q[i].properties)
+        let desc = '<![CDATA[<!DOCTYPE html>' +
+          '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
+          '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
+          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+          '<br /><br />' +
+          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebs + '</a>' +
+          '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
+          '<hr />' +
+          '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+          '<hr />' +
+          '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
+          '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
+          '<hr /><br />' +
+          '</font>' +
+          '</body>' +
+          '</html>]]>'
+
+        let description = {
+          'Description': desc
+        }
+
+        _.assign(q[i].properties, description)
+
+        // console.log(q[i])
+      })
+      console.log(q)
+      resolve(q)
+    })
+  }
+
   const geofyIt = function (q) {
     console.log('GEOFYING')
     let q1 = {
@@ -212,14 +292,15 @@ function getSorted (req, res, next) {
       resolve(q2)
     })
   }
-  
-  const parseK = function (q3, sB) {
+
+  const parseK = function (q3) {
     console.log('PARSING')
     let q4 = JSON.parse(q3)
     let dKML = tokml(q4, {
       documentName: 'Kimco Sites',
       documentDescription: 'Kimco Sites',
       simplestyle: true,
+      description: 'Description',
       name: sB
     })
 
@@ -239,6 +320,10 @@ function getSorted (req, res, next) {
   e(sB)
   .then(function (result) {
     let q = styleIt(result)
+    return q
+  })
+  .then(function (result) {
+    let q = descriptIt(result)
     return q
   })
   .then(function (result) {
