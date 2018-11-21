@@ -1,6 +1,6 @@
 {
-  "name": "node-gee-kml",
-  "version": "0.1.0",
+  "name": "oh-gee-whiz",
+  "version": "0.2.1",
   "description": "nodejs for geojson and kml from mssql database",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,9 @@
   "author": "Dale Kunce",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "lodash": "^4.17.11",
     "npm": "^6.4.1",
+    "promise": "^8.0.2",
     "restify": "^7.1.1",
     "tedious": "^2.3.1",
     "tedious-promises": "^0.4.1",
