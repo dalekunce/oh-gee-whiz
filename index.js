@@ -74,102 +74,103 @@ function getKmlTest (req, res, next) {
 }
 
 /** Search **/
+const getSearch = function (req, res, next) {
+  let qS = req.query.q
 
-function getSearch (req, res, next) {
-  const qS = req.query.q
+  let qO = {}
+  if (req.query.s) {
+    qO = req.query.s
+  } else {
+    qO = ''
+  }
 
   console.log('search started for ' + qS)
 
-  function goSearch (sT) {
-    tp.sql(`SELECT TOP (3)
-      'Feature' AS type,
-      SiteNo as id,
-      Name as [properties.Name],
-      SiteNo as [properties.SiteNo],
-      PropertyManager as [properties.PropertyManager],
-      LeasingAgent as [properties.LeasingAgent],
-      'medium' as [properties.marker-size],
-      '' as [properties.marker-symbol],
-      'Point' as [geometry.type],
-      JSON_QUERY
-      ( FORMATMESSAGE('[%s,%s]',
-      FORMAT(longitude, N'0.##########'),
-      FORMAT(latitude, N'0.##########'))
-    ) as [geometry.coordinates]
-    FROM KIMprops
-    WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
-    ORDER BY SiteNo
-    FOR JSON PATH`)
-    .parameter('qID', TYPES.VarChar, sT)
-    .execute()
-    .then(function (result, rowCount) {
-      console.log(result)
-      if (rowCount < 1) {
-        console.log('returned ' + rowCount + ' features')
-        console.log('Not a Valid Search Term')
-        next()
-      } else {
-        // sql requires some parsing because mssql doesn't output clean geojson by default
-        const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
-        let d1 = {
-          type: "FeatureCollection",
-          "features":
-            eval(features)
-        }
-
-        let d2 = JSON.stringify(d1, null, 2)
-
-        return d2
-      }
-    }).then(function (d) {
-      let d4 = JSON.parse(d)
-      let d5 = tokml(d4, {
-        documentName: 'Kimco Search Results',
-        documentDescription: 'Kimco Search Results',
-        name: 'name'
-      })
-      return d5
-    }).then(function (f) {
-      res.set({
-        'content-type': 'application/xml',
-        'content-disposition': 'attachment; filename="sites.kml"'
-      })
-      res.send(f)
+  function goSearch (sT, sO) {
+    tp.sql(`SELECT TOP (10)
+    'Feature' AS type,
+    SiteNo as id,
+    LeasingAgent as LeasingAgent,
+    PropertyManager as PropertyManager,
+    Name as [properties.Name],
+    SiteNo as [properties.SiteNo],
+    PropertyManager as [properties.PropertyManager],
+    LeasingAgent as [properties.LeasingAgent],
+    'Point' as [geometry.type],
+    JSON_QUERY
+    ( FORMATMESSAGE('[%s,%s]',
+    FORMAT(longitude, N'0.##########'),
+    FORMAT(latitude, N'0.##########'))
+  ) as [geometry.coordinates]
+  FROM KIMprops
+  WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
+  FOR JSON PATH`)
+  .parameter('qID', TYPES.VarChar, sT)
+  .execute()
+  .then(function (result, rowCount) {
+    console.log(result)
+    if (rowCount < 1) {
+      console.log('returned ' + rowCount + ' features')
+      console.log('Not a Valid Search Term')
       next()
-    }).fail(function (err) {
-      console.log(err)
-    })
-  }
+    } else {
+      // sql requires some parsing because mssql doesn't output clean geojson by default
+      const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
+      let d1 = {
+        type: 'FeatureCollection',
+        'features':
+        eval(features)
+      }
 
-  goSearch(qS)
+      let d2 = JSON.stringify(d1, null, 2)
+
+      return d2
+    }
+  }).then(function (d) {
+    let d4 = JSON.parse(d)
+    let d5 = tokml(d4, {
+      documentName: 'Kimco Search Results',
+      documentDescription: 'Kimco Search Results',
+      name: 'name'
+    })
+    return d5
+  }).then(function (f) {
+    res.set({
+      'content-type': 'application/xml',
+      'content-disposition': 'attachment; filename="sites.kml"'
+    })
+    res.send(f)
+    next()
+  }).fail(function (err) {
+    console.log(err)
+  })
+}
+
+goSearch(qS, qO)
 }
 
 /** sorter for data **/
-
+let sB = {}
 function getSorted (req, res, next) {
-  const sortBy = req.query.s
-  let docName = {}
+  sB = req.query.s
   let style = {}
 
   const e = function (s) {
     console.log('SORTING')
     // sort the layer for the intended
-    if (s === 'propman') {
-      docName = 'PropertyManager'
+    if (s === 'PropertyManager') {
       style = {
         'marker-size': 'large',
         'marker-symbol': 'commercial',
         'marker-color': '#008015'
       }
-    } else if (s === 'lease') {
-      docName = 'LeasingAgent'
+    } else if (s === 'LeasingAgent') {
       style = {
         'marker-size': 'large',
         'marker-symbol': 'camera',
         'marker-color': '#801876'
       }
     } else {
-      docName = 'KimcoSites'
       style = {
         'marker-size': 'large',
         'marker-symbol': 'star',
@@ -177,19 +178,19 @@ function getSorted (req, res, next) {
       }
     }
 
-    console.log(docName)
+    console.log(sB)
 
-    let kimcoS = kimco
-    console.log(kimcoS)
+    // let kimcoS = kimco
 
     return new Promise((resolve, reject) => {
+      let kimcoS = _.sortBy(kimco, sB)
+
       resolve(kimcoS)
     })
   }
 
   const styleIt = function (q) {
     console.log('STYLING')
-
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         _.assign(q[i].properties, style)
@@ -201,29 +202,25 @@ function getSorted (req, res, next) {
   const geofyIt = function (q) {
     console.log('GEOFYING')
     let q1 = {
-      type: "FeatureCollection",
-      "features":
-        eval(q)
+      type: 'FeatureCollection',
+      'features':
+      eval(q)
     }
-
-    console.log(q1)
-
-    console.log('done with the geo stuff')
 
     return new Promise((resolve, reject) => {
       let q2 = JSON.stringify(q1, null, 2)
       resolve(q2)
     })
   }
-
-  const parseK = function (q3) {
+  
+  const parseK = function (q3, sB) {
     console.log('PARSING')
     let q4 = JSON.parse(q3)
     let dKML = tokml(q4, {
-      documentName: 'Property Manager',
-      documentDescription: 'Property Manager',
+      documentName: 'Kimco Sites',
+      documentDescription: 'Kimco Sites',
       simplestyle: true,
-      name: 'Name'
+      name: sB
     })
 
     return new Promise((resolve, reject) => {
@@ -239,7 +236,7 @@ function getSorted (req, res, next) {
   }
 
   // let we = Promise.all(
-  e(sortBy)
+  e(sB)
   .then(function (result) {
     let q = styleIt(result)
     return q
@@ -261,9 +258,6 @@ function getSorted (req, res, next) {
   })
   // .catch((error) => {
   //   console.error('Error:', error.toString())
-  // })
-
-  // we()
 }
 
 /* Is the server up */
