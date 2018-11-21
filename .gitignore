@@ -5,6 +5,8 @@ config.json
 .env
 sql
 kimco.json
+LeasingAgents.kml
+PropertyManagers.kml
 
 # Logs #
 ######################

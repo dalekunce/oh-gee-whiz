@@ -39,7 +39,7 @@ connection.on('connect', function (err) {
 
 /** Utilities **/
 
-function statusUpdate (req, res, next) {
+const statusUpdate = function (req, res, next) {
   result.serverstatus = 'API reporting for duty'
   res.set({
     'content-type': 'application/json'
@@ -63,7 +63,7 @@ function statusUpdate (req, res, next) {
   next()
 }
 
-function getKmlTest (req, res, next) {
+const getKmlTest = function (req, res, next) {
   const kml = tokml(testJSON)
   res.set({
     'content-type': 'application/xml',
@@ -105,6 +105,7 @@ const getSearch = function (req, res, next) {
       FORMAT(latitude, N'0.##########'))
     ) as [geometry.coordinates]
     FROM KIMprops
+    WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
     FOR JSON PATH`)
     .parameter('qID', TYPES.VarChar, sT)
     .execute()
@@ -126,8 +127,6 @@ const getSearch = function (req, res, next) {
       return new Promise((resolve, reject) => {
         _.forEach(q, function (element, i) {
           // set description for later use by tokml
-          console.log('feature ' + i)
-          console.log(q[i].properties)
           let desc = '<![CDATA[<!DOCTYPE html>' +
             '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
             '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
@@ -139,7 +138,7 @@ const getSearch = function (req, res, next) {
             '<b>Region:</b>' + q[i].properties.Region + '<br />' +
             '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
             '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebs + '</a>' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
             '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -163,6 +162,19 @@ const getSearch = function (req, res, next) {
         resolve(q)
       })
     }).then(function (d) {
+      let style = {
+        'marker-size': 'large',
+        'marker-symbol': 'circle',
+        'marker-color': '#FC6363'
+      }
+
+      return new Promise((resolve, reject) => {
+        _.forEach(d, function (element, i) {
+          _.assign(d[i].properties, style)
+        })
+        resolve(d)
+      })
+    }).then(function (d) {
       let d4 = JSON.parse(d)
       let d5 = tokml(d4, {
         documentName: 'Kimco Search Results',
@@ -174,7 +186,7 @@ const getSearch = function (req, res, next) {
     }).then(function (f) {
       res.set({
         'content-type': 'application/xml',
-        'content-disposition': 'attachment; filename="sites.kml"'
+        'content-disposition': 'attachment; filename="' + qS + '.kml"'
       })
       res.send(f)
       next()
@@ -227,7 +239,7 @@ function getSorted (req, res, next) {
   }
 
   const styleIt = function (q) {
-    console.log('STYLING')
+    // console.log('STYLING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         _.assign(q[i].properties, style)
@@ -237,12 +249,12 @@ function getSorted (req, res, next) {
   }
 
   const descriptIt = function (q) {
-    console.log('DESCRIPTING')
+    // console.log('DESCRIPTING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
-        console.log('feature ' + i)
-        console.log(q[i].properties)
+        // console.log('feature ' + i)
+        // console.log(q[i].properties)
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
@@ -254,7 +266,7 @@ function getSorted (req, res, next) {
           '<b>Region:</b>' + q[i].properties.Region + '<br />' +
           '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
           '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebs + '</a>' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -271,16 +283,14 @@ function getSorted (req, res, next) {
         }
 
         _.assign(q[i].properties, description)
-
-        // console.log(q[i])
       })
-      console.log(q)
+
       resolve(q)
     })
   }
 
   const geofyIt = function (q) {
-    console.log('GEOFYING')
+    // console.log('GEOFYING')
     let q1 = {
       type: 'FeatureCollection',
       'features':
@@ -294,18 +304,18 @@ function getSorted (req, res, next) {
   }
 
   const parseK = function (q3) {
-    console.log('PARSING')
+    // console.log('PARSING')
     let q4 = JSON.parse(q3)
     let dKML = tokml(q4, {
-      documentName: 'Kimco Sites',
-      documentDescription: 'Kimco Sites',
+      documentName: 'Kimco ' + sB,
+      documentDescription: 'Kimco ' + sB,
       simplestyle: true,
       description: 'Description',
       name: sB
     })
 
     return new Promise((resolve, reject) => {
-      fs.writeFile('kimco.kml', dKML, function (err) {
+      fs.writeFile('./data/' + sB + '.kml', dKML, function (err) {
         if (err) {
           return console.log(err)
         } else {
@@ -336,13 +346,14 @@ function getSorted (req, res, next) {
   .then(function (f) {
     res.set({
       'content-type': 'application/xml',
-      'content-disposition': 'attachment; filename="sites.kml"'
+      'content-disposition': 'attachment; filename="' + sB + '.kml"'
     })
     res.send(f)
     next()
   })
-  // .catch((error) => {
-  //   console.error('Error:', error.toString())
+  .catch((error) => {
+    console.error('Error:', error.toString())
+  })
 }
 
 /* Is the server up */
