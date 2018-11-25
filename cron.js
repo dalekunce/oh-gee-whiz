@@ -6,6 +6,7 @@ const _ = require('lodash')
 const Promise = require('promise')
 const fs = require('fs')
 const CronJob = require('cron').CronJob
+const replace = require('replace-in-file')
 
 tp.setConnectionConfig(config) // global scope
 
@@ -21,13 +22,20 @@ const TYPES = require('tedious').TYPES
 // let result = {}
 const connection = new Connection(config)
 
-connection.on('connect', function (err) {
-  if (err) {
-    console.log('ERROR Connecting to ' + config.server)
-  } else {
-    console.log('Connected to ' + config.server + ' Started')
-  }
-})
+// connection.on('connect', function (err) {
+//   if (err) {
+//     console.log('ERROR Connecting to ' + config.server)
+//   } else {
+//     console.log('Connected to ' + config.server + ' Started')
+//   }
+// })
+
+// set the file config for use later by find - replace
+let replaceOptions = {
+  files: './data/KimcoSites.kml',
+  from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
+  to: 'http://gee-server.kimcorealty.com/icons/kimco_2017.png'
+}
 
 const getData = function () {
   tp.sql(`SELECT
@@ -84,13 +92,13 @@ const getData = function () {
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
           '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
-          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+          '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -100,7 +108,7 @@ const getData = function () {
           '<hr /><br />' +
           '</font>' +
           '</body>' +
-          '</html>]]>'
+          '</html>'
 
         let description = {
           'Description': desc
@@ -145,18 +153,30 @@ const makeKML = function (s) {
         'marker-symbol': 'commercial',
         'marker-color': '#008015'
       }
+      replaceOptions = {
+        files: './data/PropertyManager.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-commercial+008015.png',
+        to: 'http://maps.google.com/mapfiles/kml/shapes/hiker.png'
+      }
     } else if (s === 'LeasingAgent') {
       style = {
         'marker-size': 'large',
         'marker-symbol': 'camera',
         'marker-color': '#801876'
       }
-    } else {
+
+      replaceOptions = {
+        files: './data/LeasingAgent.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-camera+801876.png',
+        to: 'http://maps.google.com/mapfiles/kml/shapes/camera.png'
+      }
+    } else if (s === 'KimcoSites') {
       style = {
         'marker-size': 'large',
         'marker-symbol': 'star',
         'marker-color': '#2C4880'
       }
+      sB = 'Name'
     }
 
     // console.log(sB)
@@ -190,13 +210,13 @@ const makeKML = function (s) {
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
           '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
-          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+          '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -235,14 +255,26 @@ const makeKML = function (s) {
 
   const parseK = function (q3) {
     // console.log('PARSING')
+    let dKML
     let q4 = JSON.parse(q3)
-    let dKML = tokml(q4, {
-      documentName: 'Kimco ' + sB,
-      documentDescription: 'Kimco ' + sB,
-      simplestyle: true,
-      description: 'Description',
-      name: sB
-    })
+    if (sB === 'Name') {
+      dKML = tokml(q4, {
+        documentName: 'Kimco Sites',
+        documentDescription: 'Kimco Sites',
+        simplestyle: true,
+        description: 'Description',
+        name: sB
+      })
+      sB = 'KimcoSites'
+    } else {
+      dKML = tokml(q4, {
+        documentName: 'Kimco ' + sB,
+        documentDescription: 'Kimco ' + sB,
+        simplestyle: true,
+        description: 'Description',
+        name: sB
+      })
+    }
 
     return new Promise((resolve, reject) => {
       fs.writeFile('./data/' + sB + '.kml', dKML, function (err) {
@@ -287,21 +319,58 @@ new CronJob('0 23 * * * *', function () {
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for leasingagent every night at 1am server time
-new CronJob('0 1 * * * *', function () {
+new CronJob('2 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('Build Leasing Agent KML ' + logTime)
   makeKML('LeasingAgent')
+  replace(replaceOptions)
+    .then(changedFiles => {
+      console.log('Modified files:', changedFiles.join(', '))
+    })
+    .catch(error => {
+      console.error('Error occurred:', error)
+    })
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for propertymanager every night at 1am server time
-new CronJob('0 2 * * * *', function () {
+new CronJob('4 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('Build Property Manager KML ' + logTime)
   makeKML('PropertyManager')
+  replace(replaceOptions)
+    .then(changedFiles => {
+      console.log('Modified files:', changedFiles.join(', '))
+    })
+    .catch(error => {
+      console.error('Error occurred:', error)
+    })
+}, null, true, 'America/Los_Angeles')
+
+// make the KML for propertymanager every night at 1am server time
+new CronJob('6 23 * * * *', function () {
+  let tS = Number(new Date())
+  let logTime = new Date(tS)
+  console.log('Build Kimco Sites ' + logTime)
+  makeKML('KimcoSites')
+  replace(replaceOptions)
+    .then(changedFiles => {
+      console.log('Modified files:', changedFiles.join(', '))
+    })
+    .catch(error => {
+      console.error('Error occurred:', error)
+    })
 }, null, true, 'America/Los_Angeles')
 
 // for dev use
 // getData()
-makeKML('LeasingAgent')
+let devLayer = 'LeasingAgent'
+makeKML(devLayer)
+replace(replaceOptions)
+  .then(changedFiles => {
+    console.log('Modified files:', changedFiles.join(', '))
+  })
+  .catch(error => {
+    console.error('Error occurred:', error)
+  })

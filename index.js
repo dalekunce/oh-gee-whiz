@@ -129,13 +129,13 @@ const getSearch = function (req, res, next) {
             '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
             '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
             '<br /><br />' +
-            '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-            '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-            '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-            '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-            '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-            '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+            '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+            '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+            '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+            '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+            '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+            '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
             '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -145,7 +145,7 @@ const getSearch = function (req, res, next) {
             '<hr /><br />' +
             '</font>' +
             '</body>' +
-            '</html>]]>'
+            '</html>'
 
           let description = {
             'Description': desc
@@ -224,6 +224,7 @@ function getSorted (req, res, next) {
         'marker-symbol': 'star',
         'marker-color': '#2C4880'
       }
+      sB = 'SiteNo'
     }
 
     console.log(sB)
@@ -257,13 +258,13 @@ function getSorted (req, res, next) {
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
           '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
-          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+          '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -273,7 +274,7 @@ function getSorted (req, res, next) {
           '<hr /><br />' +
           '</font>' +
           '</body>' +
-          '</html>]]>'
+          '</html>'
 
         let description = {
           'Description': desc
