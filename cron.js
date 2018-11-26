@@ -321,13 +321,13 @@ new CronJob('4 23 * * * *', function () {
   let logTime = new Date(tS)
   console.log('Build Property Manager KML ' + logTime)
   makeKML('PropertyManager')
-  replace(replaceOptions)
-    .then(changedFiles => {
-      console.log('Modified files:', changedFiles.join(', '))
-    })
-    .catch(error => {
-      console.error('Error occurred:', error)
-    })
+  // replace(replaceOptions)
+  //   .then(changedFiles => {
+  //     console.log('Modified files:', changedFiles.join(', '))
+  //   })
+  //   .catch(error => {
+  //     console.error('Error occurred:', error)
+  //   })
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for propertymanager every night at 23:06
