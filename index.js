@@ -172,13 +172,13 @@ const getSearch = function (req, res, next) {
       let q = {
         type: 'FeatureCollection',
         'features':
-        eval(d)
+        eval(d) // ew but its fast, shrug
       }
       let d1 = tokml(q, {
         documentName: 'Search Results for ' + qS,
         documentDescription: 'Search Results for ' + qS,
         description: 'Description',
-        simplestyle: true,
+        simplestyle: true, // important!
         name: 'Name'
       })
       return d1
@@ -205,7 +205,7 @@ function getSorted (req, res, next) {
 
   const e = function (s) {
     console.log('SORTING')
-    // sort the layer for the intended
+    // sort the layer for the intended style gets replaced for static kml files in cron.js this is only temporary
     if (s === 'PropertyManager') {
       style = {
         'marker-size': 'large',
@@ -224,7 +224,7 @@ function getSorted (req, res, next) {
         'marker-symbol': 'star',
         'marker-color': '#2C4880'
       }
-      sB = 'SiteNo'
+      sB = 'SiteNo' // override for bad uri path
     }
 
     console.log(sB)
@@ -292,7 +292,7 @@ function getSorted (req, res, next) {
     let q1 = {
       type: 'FeatureCollection',
       'features':
-      eval(q)
+      eval(q) // ew not really a faster way to do it though
     }
 
     return new Promise((resolve, reject) => {
@@ -324,7 +324,7 @@ function getSorted (req, res, next) {
     })
   }
 
-  // let we = Promise.all(
+  // kicks off the sort path as a promise chain
   e(sB)
   .then(function (result) {
     let q = styleIt(result)
@@ -343,7 +343,7 @@ function getSorted (req, res, next) {
   })
   .then(function (f) {
     res.set({
-      'content-type': 'application/xml',
+      'content-type': 'application/vnd.google-earth.kml+xml',
       'content-disposition': 'attachment; filename="' + sB + '.kml"'
     })
     res.send(f)
@@ -360,15 +360,16 @@ server.get('/status', statusUpdate)
 /** Get KML Test **/
 server.get('/test/kml', getKmlTest)
 
-/** KML NetworkLink for Leasing Agents and Property Managers **/
-server.get('/sort/:sort', getSorted)
-
 /** Search **/
 server.get('/search/:search', getSearch)
 
+/** KML NetworkLink for Leasing Agents and Property Managers **/
+server.get('/sort/:sort', getSorted)
+
+/** Serves static kml files **/
 server.get('/data/*', restify.plugins.serveStatic({
   directory: './data/',
-  default: 'KimcoSites.kml',
+  default: 'KimcoSites.kml', // if nothing specific return just normal kimcosites
   appendRequestPath: false
 }))
 
