@@ -366,6 +366,12 @@ server.get('/sort/:sort', getSorted)
 /** Search **/
 server.get('/search/:search', getSearch)
 
+server.get('/data/*', restify.plugins.serveStatic({
+  directory: './data/',
+  default: 'KimcoSites.kml',
+  appendRequestPath: false
+}))
+
 server.listen(3000, function () {
   console.log('%s listening at %s', server.name, server.url)
 })
