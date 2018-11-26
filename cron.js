@@ -22,14 +22,6 @@ const TYPES = require('tedious').TYPES
 // let result = {}
 const connection = new Connection(config)
 
-// connection.on('connect', function (err) {
-//   if (err) {
-//     console.log('ERROR Connecting to ' + config.server)
-//   } else {
-//     console.log('Connected to ' + config.server + ' Started')
-//   }
-// })
-
 // set the file config for use later by find - replace
 let replaceOptions = {
   files: './data/KimcoSites.kml',
@@ -69,7 +61,6 @@ const getData = function () {
     console.log(result)
     let combined = ''
     // sql requires some parsing because mssql doesn't output clean geojson by default
-    // const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
     return new Promise((resolve, reject) => {
       _.forEach(result, function (element, i) {
         combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
@@ -83,10 +74,6 @@ const getData = function () {
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
-        console.log('feature' + i)
-        // let desc = 'this is a test' +
-        // ' more testing' + q[i].properties.SiteNo
-        console.log(q[i].properties)
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
@@ -115,10 +102,7 @@ const getData = function () {
         }
 
         _.assign(q[i].properties, description)
-
-        // console.log(q[i])
       })
-      console.log(q)
       resolve(q)
     })
   }).then(function (d1) {
@@ -203,8 +187,6 @@ const makeKML = function (s) {
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
-        // console.log('feature ' + i)
-        // console.log(q[i].properties)
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
