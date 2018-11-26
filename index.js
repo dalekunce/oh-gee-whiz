@@ -129,13 +129,13 @@ const getSearch = function (req, res, next) {
             '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
             '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
             '<br /><br />' +
-            '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-            '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-            '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-            '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-            '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-            '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+            '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+            '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+            '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+            '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+            '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+            '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
             '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -145,7 +145,7 @@ const getSearch = function (req, res, next) {
             '<hr /><br />' +
             '</font>' +
             '</body>' +
-            '</html>]]>'
+            '</html>'
 
           let description = {
             'Description': desc
@@ -172,13 +172,13 @@ const getSearch = function (req, res, next) {
       let q = {
         type: 'FeatureCollection',
         'features':
-        eval(d)
+        eval(d) // ew but its fast, shrug
       }
       let d1 = tokml(q, {
         documentName: 'Search Results for ' + qS,
         documentDescription: 'Search Results for ' + qS,
         description: 'Description',
-        simplestyle: true,
+        simplestyle: true, // important!
         name: 'Name'
       })
       return d1
@@ -205,7 +205,7 @@ function getSorted (req, res, next) {
 
   const e = function (s) {
     console.log('SORTING')
-    // sort the layer for the intended
+    // sort the layer for the intended style gets replaced for static kml files in cron.js this is only temporary
     if (s === 'PropertyManager') {
       style = {
         'marker-size': 'large',
@@ -224,6 +224,7 @@ function getSorted (req, res, next) {
         'marker-symbol': 'star',
         'marker-color': '#2C4880'
       }
+      sB = 'SiteNo' // override for bad uri path
     }
 
     console.log(sB)
@@ -257,13 +258,13 @@ function getSorted (req, res, next) {
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
           '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
-          '<b>Site No:</b>' + q[i].properties.SiteNo + '<br />' +
-          '<b>Center Name:</b>' + q[i].properties.CenterName + '<br />' +
-          '<b>Address:</b>' + q[i].properties.Address + '<br />' +
-          '<b>Region:</b>' + q[i].properties.Region + '<br />' +
-          '<b>GLA:</b>' + q[i].properties.GLA + '<br />' +
-          '<b>Partnership:</b>' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebs" target="asset">' + q[i].properties.LinkToWebsite + '</a>' +
+          '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
+          '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
+          '<b>Address:</b> ' + q[i].properties.Address + '<br />' +
+          '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
+          '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
+          '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -273,7 +274,7 @@ function getSorted (req, res, next) {
           '<hr /><br />' +
           '</font>' +
           '</body>' +
-          '</html>]]>'
+          '</html>'
 
         let description = {
           'Description': desc
@@ -291,7 +292,7 @@ function getSorted (req, res, next) {
     let q1 = {
       type: 'FeatureCollection',
       'features':
-      eval(q)
+      eval(q) // ew not really a faster way to do it though
     }
 
     return new Promise((resolve, reject) => {
@@ -323,7 +324,7 @@ function getSorted (req, res, next) {
     })
   }
 
-  // let we = Promise.all(
+  // kicks off the sort path as a promise chain
   e(sB)
   .then(function (result) {
     let q = styleIt(result)
@@ -342,7 +343,7 @@ function getSorted (req, res, next) {
   })
   .then(function (f) {
     res.set({
-      'content-type': 'application/xml',
+      'content-type': 'application/vnd.google-earth.kml+xml',
       'content-disposition': 'attachment; filename="' + sB + '.kml"'
     })
     res.send(f)
@@ -359,11 +360,18 @@ server.get('/status', statusUpdate)
 /** Get KML Test **/
 server.get('/test/kml', getKmlTest)
 
+/** Search **/
+server.get('/search/:search', getSearch)
+
 /** KML NetworkLink for Leasing Agents and Property Managers **/
 server.get('/sort/:sort', getSorted)
 
-/** Search **/
-server.get('/search/:search', getSearch)
+/** Serves static kml files **/
+server.get('/data/*', restify.plugins.serveStatic({
+  directory: './data/',
+  default: 'KimcoSites.kml', // if nothing specific return just normal kimcosites
+  appendRequestPath: false
+}))
 
 server.listen(3000, function () {
   console.log('%s listening at %s', server.name, server.url)
