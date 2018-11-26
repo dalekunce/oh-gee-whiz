@@ -66,7 +66,7 @@ const statusUpdate = function (req, res, next) {
 const getKmlTest = function (req, res, next) {
   const kml = tokml(testJSON)
   res.set({
-    'content-type': 'application/xml',
+    'content-type': 'application/vnd.google-earth.kml+xml',
     'content-disposition': 'attachment; filename="test.kml"'
   })
   res.send(kml)
@@ -135,7 +135,7 @@ const getSearch = function (req, res, next) {
             '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
             '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
             '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
-            '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
+            '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
             '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -184,7 +184,7 @@ const getSearch = function (req, res, next) {
       return d1
     }).then(function (f) {
       res.set({
-        'content-type': 'application/xml',
+        'content-type': 'application/vnd.google-earth.kml+xml',
         'content-disposition': 'attachment; filename="' + qS + '.kml"'
       })
       res.send(f)
@@ -209,13 +209,13 @@ function getSorted (req, res, next) {
     if (s === 'PropertyManager') {
       style = {
         'marker-size': 'large',
-        'marker-symbol': 'commercial',
+        'marker-symbol': 'building',
         'marker-color': '#008015'
       }
     } else if (s === 'LeasingAgent') {
       style = {
         'marker-size': 'large',
-        'marker-symbol': 'camera',
+        'marker-symbol': 'city',
         'marker-color': '#801876'
       }
     } else {
@@ -264,7 +264,7 @@ function getSorted (req, res, next) {
           '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
           '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
           '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -309,7 +309,7 @@ function getSorted (req, res, next) {
       documentDescription: 'Kimco ' + sB,
       simplestyle: true,
       description: 'Description',
-      name: sB
+      name: 'SiteNo'
     })
 
     return new Promise((resolve, reject) => {

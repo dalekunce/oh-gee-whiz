@@ -85,7 +85,7 @@ const getData = function () {
           '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
           '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
           '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -198,7 +198,7 @@ const makeKML = function (s) {
           '<b>Region:</b> ' + q[i].properties.Region + '<br />' +
           '<b>GLA:</b> ' + q[i].properties.GLA + '<br />' +
           '<b>Partnership:</b> ' + q[i].properties.Partnership + '<br />' +
-          '<hr /><b>Link to Web Site:</b> <br /><a href="LinkToWebsite" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
+          '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
           '<b>Overlay Site Plan:</b> <a href="' + q[i].properties.LinkToOverlay + '" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
@@ -245,7 +245,7 @@ const makeKML = function (s) {
         documentDescription: 'Kimco Sites',
         simplestyle: true,
         description: 'Description',
-        name: sB
+        name: 'SiteNo'
       })
       sB = 'KimcoSites'
     } else {
@@ -254,7 +254,7 @@ const makeKML = function (s) {
         documentDescription: 'Kimco ' + sB,
         simplestyle: true,
         description: 'Description',
-        name: sB
+        name: 'SiteNo'
       })
     }
 
@@ -306,13 +306,13 @@ new CronJob('2 23 * * * *', function () {
   let logTime = new Date(tS)
   console.log('Build Leasing Agent KML ' + logTime)
   makeKML('LeasingAgent')
-  replace(replaceOptions)
-    .then(changedFiles => {
-      console.log('Modified files:', changedFiles.join(', '))
-    })
-    .catch(error => {
-      console.error('Error occurred:', error)
-    })
+  // replace(replaceOptions)
+  //   .then(changedFiles => {
+  //     console.log('Modified files:', changedFiles.join(', '))
+  //   })
+  //   .catch(error => {
+  //     console.error('Error occurred:', error)
+  //   })
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for propertymanager every night at 23:04
