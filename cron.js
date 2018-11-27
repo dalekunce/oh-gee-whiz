@@ -166,7 +166,7 @@ const makeKML = function (s) {
       replaceOptions = {
         files: './data/KimcoSites.kml',
         from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-        to: 'http://localhost:3000/data/kimco_logo_2018.png'
+        to: 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
       }
     }
 
