@@ -12,6 +12,7 @@ tp.setConnectionConfig(config) // global scope
 
 // set the base kml to use - makes things faster to use a local file
 const kimco = require('./data/kimco.json')
+const kimcoLogo = 'http://localhost:3000/data/kimco_logo_2018.png'
 
 /** SQL connection **/
 const Connection = require('tedious').Connection
@@ -77,7 +78,8 @@ const getData = function () {
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
-          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com">' +
+          '<img border="0" width="32px" src="' + kimcoLogo + '" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
           '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
           '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
@@ -134,33 +136,38 @@ const makeKML = function (s) {
     if (s === 'PropertyManager') {
       style = {
         'marker-size': 'large',
-        'marker-symbol': 'commercial',
+        'marker-symbol': 'building',
         'marker-color': '#008015'
       }
-      replaceOptions = {
-        files: './data/PropertyManager.kml',
-        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-commercial+008015.png',
-        to: 'http://maps.google.com/mapfiles/kml/shapes/hiker.png'
-      }
+      // replaceOptions = {
+      //   files: './data/PropertyManager.kml',
+      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-commercial+008015.png',
+      //   to: 'http://maps.google.com/mapfiles/kml/shapes/hiker.png'
+      // }
     } else if (s === 'LeasingAgent') {
       style = {
         'marker-size': 'large',
-        'marker-symbol': 'camera',
+        'marker-symbol': 'city',
         'marker-color': '#801876'
       }
 
-      replaceOptions = {
-        files: './data/LeasingAgent.kml',
-        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-camera+801876.png',
-        to: 'http://maps.google.com/mapfiles/kml/shapes/camera.png'
-      }
+      // replaceOptions = {
+      //   files: './data/LeasingAgent.kml',
+      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-camera+801876.png',
+      //   to: 'http://maps.google.com/mapfiles/kml/shapes/camera.png'
+      // }
     } else if (s === 'KimcoSites') {
       style = {
         'marker-size': 'large',
         'marker-symbol': 'star',
         'marker-color': '#2C4880'
       }
-      sB = 'Name'
+
+      replaceOptions = {
+        files: './data/KimcoSites.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
+        to: 'http://localhost:3000/data/kimco_logo_2018.png'
+      }
     }
 
     // console.log(sB)
@@ -190,7 +197,8 @@ const makeKML = function (s) {
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
-          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com">' +
+          '<img border="0" width="32px" src="' + kimcoLogo + '" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
           '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
           '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
@@ -250,8 +258,8 @@ const makeKML = function (s) {
       sB = 'KimcoSites'
     } else {
       dKML = tokml(q4, {
-        documentName: 'Kimco ' + sB,
-        documentDescription: 'Kimco ' + sB,
+        documentName: sB,
+        documentDescription: sB,
         simplestyle: true,
         description: 'Description',
         name: 'SiteNo'
@@ -350,12 +358,14 @@ new CronJob('6 23 * * * *', function () {
 // ***********
 
 // getData()
-// let devLayer = 'LeasingAgent'
-// makeKML(devLayer)
-// replace(replaceOptions)
-//   .then(changedFiles => {
-//     console.log('Modified files:', changedFiles.join(', '))
-//   })
-//   .catch(error => {
-//     console.error('Error occurred:', error)
-//   })
+let devLayer = 'KimcoSites'
+// let devLayer = 'PropertyManager'
+// let devLayer = 'KimcoSites'
+makeKML(devLayer)
+replace(replaceOptions)
+  .then(changedFiles => {
+    console.log('Modified files:', changedFiles.join(', '))
+  })
+  .catch(error => {
+    console.error('Error occurred:', error)
+  })

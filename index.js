@@ -10,6 +10,7 @@ const fs = require('fs')
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
 const kimco = require('./data/kimco.json')
+const kimcoLogo = 'http://localhost:3000/data/kimco_logo_2018.png'
 
 tp.setConnectionConfig(config) // global scope
 
@@ -106,6 +107,8 @@ const getSearch = function (req, res, next) {
     ) as [geometry.coordinates]
     FROM KIMprops
     WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
+      OR KIMprops.LeasingAgent LIKE Concat('%',@qID,'%')
+      OR KIMprops.PropertyManager LIKE Concat('%',@qID,'%')
     FOR JSON PATH`)
     .parameter('qID', TYPES.VarChar, sT)
     .execute()
@@ -127,7 +130,8 @@ const getSearch = function (req, res, next) {
           let desc = '<![CDATA[<!DOCTYPE html>' +
             '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
             '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
-            '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+            '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com">' +
+            '<img border="0" width="32px" src="' + kimcoLogo + '" alt="Kimco Logo" /></a>' +
             '<br /><br />' +
             '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
             '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
@@ -256,7 +260,8 @@ function getSorted (req, res, next) {
         let desc = '<![CDATA[<!DOCTYPE html>' +
           '<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height: 100%;"><head>' +
           '<title>KIMCO Detail | ' + q[i].properties.SiteNo + '</title>' +
-          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com"><img border="0" width="32px" src="http://gee-server.kimcorealty.com/icons/kimco_2017.png" alt="Kimco Logo" /></a>' +
+          '<meta http-equiv="content-type" content="text/html; charset=utf-8"/></head><body><font face="Verdana"><a href="http://kimcorealty.com">' +
+          '<img border="0" width="32px" src="' + kimcoLogo + '" alt="Kimco Logo" /></a>' +
           '<br /><br />' +
           '<b>Site No:</b> ' + q[i].properties.SiteNo + '<br />' +
           '<b>Center Name:</b> ' + q[i].properties.CenterName + '<br />' +
