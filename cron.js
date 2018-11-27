@@ -12,7 +12,7 @@ tp.setConnectionConfig(config) // global scope
 
 // set the base kml to use - makes things faster to use a local file
 const kimco = require('./data/kimco.json')
-const kimcoLogo = 'http://localhost:3000/data/kimco_logo_2018.png'
+const kimcoLogo = 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
 
 /** SQL connection **/
 const Connection = require('tedious').Connection
@@ -27,7 +27,7 @@ const connection = new Connection(config)
 let replaceOptions = {
   files: './data/KimcoSites.kml',
   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-  to: 'http://gee-server.kimcorealty.com/icons/kimco_2017.png'
+  to: kimcoLogo
 }
 
 const getData = function () {
