@@ -406,21 +406,30 @@ new CronJob('6 23 * * * *', function () {
     })
 }, null, true, 'America/Los_Angeles')
 
+// make the KML for kimco site buffers every night at 23:10
+new CronJob('10 23 * * * *', function () {
+  let tS = Number(new Date())
+  let logTime = new Date(tS)
+  console.log('Build Buffer ' + logTime)
+  makeRings(3)
+  makeRings(5)
+}, null, true, 'America/Los_Angeles')
+
 // ***********
 // for dev use only
 // ***********
 
 // getData()
 let devLayer = 'KimcoSites'
-makeRings(5)
 
-// let devLayer = 'PropertyManager'
-// let devLayer = 'KimcoSites'
-// makeKML(devLayer)
-// replace(replaceOptions)
-//   .then(changedFiles => {
-//     console.log('Modified files:', changedFiles.join(', '))
-//   })
-//   .catch(error => {
-//     console.error('Error occurred:', error)
-//   })
+makeKML(devLayer)
+replace(replaceOptions)
+  .then(changedFiles => {
+    console.log('Modified files:', changedFiles.join(', '))
+  })
+  .catch(error => {
+    console.error('Error occurred:', error)
+  })
+
+makeRings(3)
+makeRings(5)
