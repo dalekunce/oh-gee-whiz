@@ -7,6 +7,7 @@ const Promise = require('promise')
 const fs = require('fs')
 const CronJob = require('cron').CronJob
 const replace = require('replace-in-file')
+const turf = require('@turf/turf')
 
 tp.setConnectionConfig(config) // global scope
 
@@ -166,7 +167,7 @@ const makeKML = function (s) {
       replaceOptions = {
         files: './data/KimcoSites.kml',
         from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-        to: 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
+        to: kimcoLogo
       }
     }
 
@@ -300,6 +301,58 @@ const makeKML = function (s) {
   })
 }
 
+// make the 3 and 5 mile property rings
+const makeRings = function (dist) {
+  let distS = dist.toString()
+  console.log('Making a ' + distS + ' mile buffer KML')
+  // let points = JSON.parse(fs.readFileSync(kimco)).features
+  console.log(kimco)
+  let style = {
+    'stroke-opacity': 0.8,
+    'stroke-width': 3,
+    'fill': 'f4f',
+    'fill-opacity': 0
+  }
+  if (dist === 3) {
+    style.stroke = '#ffc300'
+  } else if (dist === 5) {
+    style.stroke = '#cd50fd'
+  }
+
+  let bufferList = []
+
+  _.forEach(kimco, function (element, i) {
+    let sN = kimco[i].properties.SiteNo
+    kimco[i].properties = {}
+    kimco[i].properties.SiteNo = sN
+    _.assign(kimco[i].properties, style)
+    let buff = turf.buffer((kimco[i]), dist, {units: 'miles'})
+    bufferList.push(buff)
+  })
+  console.log(bufferList)
+  let bufferOut = turf.featureCollection(bufferList)
+  console.log(JSON.stringify(bufferOut))
+
+  let bufferKML = tokml(bufferOut, {
+    documentName: distS + ' Kimco Site Buffer',
+    documentDescription: distS + ' Kimco Site Buffer',
+    simplestyle: true,
+    description: '',
+    name: 'SiteNo'
+  })
+
+  return new Promise((resolve, reject) => {
+    fs.writeFile('./data/' + distS + '_buffer.kml', bufferKML, function (err) {
+      if (err) {
+        return console.log(err)
+      } else {
+        console.log(distS + ' KML saved')
+      }
+    })
+    resolve(bufferKML)
+  })
+}
+
 // go get the data from the server every night at 11pm server time
 new CronJob('0 23 * * * *', function () {
   let tS = Number(new Date())
@@ -353,14 +406,22 @@ new CronJob('6 23 * * * *', function () {
     })
 }, null, true, 'America/Los_Angeles')
 
+// make the KML for kimco site buffers every night at 23:10
+new CronJob('10 23 * * * *', function () {
+  let tS = Number(new Date())
+  let logTime = new Date(tS)
+  console.log('Build Buffer ' + logTime)
+  makeRings(3)
+  makeRings(5)
+}, null, true, 'America/Los_Angeles')
+
 // ***********
 // for dev use only
 // ***********
 
 // getData()
 let devLayer = 'KimcoSites'
-// let devLayer = 'PropertyManager'
-// let devLayer = 'KimcoSites'
+
 makeKML(devLayer)
 replace(replaceOptions)
   .then(changedFiles => {
@@ -369,3 +430,6 @@ replace(replaceOptions)
   .catch(error => {
     console.error('Error occurred:', error)
   })
+
+makeRings(3)
+makeRings(5)

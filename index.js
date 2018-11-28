@@ -10,7 +10,7 @@ const fs = require('fs')
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
 const kimco = require('./data/kimco.json')
-const kimcoLogo = 'http://localhost:3000/data/kimco_logo_2018.png'
+const kimcoLogo = 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
 
 tp.setConnectionConfig(config) // global scope
 
