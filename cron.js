@@ -21,12 +21,11 @@ const Request = require('tedious').Request
 const TYPES = require('tedious').TYPES
 
 // Attempt to connect to database
-// let result = {}
 const connection = new Connection(config)
 
 // set the file config for use later by find - replace
 let replaceOptions = {
-  files: './data/KimcoSites.kml',
+  files: 'data/KimcoSites.kml',
   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
   to: kimcoLogo
 }
@@ -60,14 +59,14 @@ const getData = function () {
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
-    console.log(result)
+    // console.log(result)
     let combined = ''
     // sql requires some parsing because mssql doesn't output clean geojson by default
     return new Promise((resolve, reject) => {
       _.forEach(result, function (element, i) {
         combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
       })
-      console.log(combined)
+      // console.log(combined)
       combined = JSON.parse(combined)
       resolve(combined)
     })
@@ -334,8 +333,8 @@ const makeRings = function (dist) {
   console.log(JSON.stringify(bufferOut))
 
   let bufferKML = tokml(bufferOut, {
-    documentName: distS + ' Kimco Site Buffer',
-    documentDescription: distS + ' Kimco Site Buffer',
+    documentName: distS + ' Mile Ring',
+    documentDescription: distS + ' Mile Ring',
     simplestyle: true,
     description: '',
     name: 'SiteNo'
@@ -420,16 +419,16 @@ new CronJob('10 23 * * * *', function () {
 // ***********
 
 // getData()
-let devLayer = 'KimcoSites'
+// let devLayer = 'KimcoSites'
+//
+// makeKML(devLayer)
+// replace(replaceOptions)
+//   .then(changedFiles => {
+//     console.log('Modified files:', changedFiles.join(', '))
+//   })
+//   .catch(error => {
+//     console.error('Error occurred:', error)
+//   })
 
-makeKML(devLayer)
-replace(replaceOptions)
-  .then(changedFiles => {
-    console.log('Modified files:', changedFiles.join(', '))
-  })
-  .catch(error => {
-    console.error('Error occurred:', error)
-  })
-
-makeRings(3)
-makeRings(5)
+// makeRings(3)
+// makeRings(5)
