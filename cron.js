@@ -21,7 +21,6 @@ const Request = require('tedious').Request
 const TYPES = require('tedious').TYPES
 
 // Attempt to connect to database
-// let result = {}
 const connection = new Connection(config)
 
 // set the file config for use later by find - replace
@@ -57,17 +56,18 @@ const getData = function () {
     FORMAT(latitude, N'0.##########'))
   ) as [geometry.coordinates]
   FROM KIMprops
+  WHERE KIMprops.active = 'y'
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
-    console.log(result)
+    // console.log(result)
     let combined = ''
     // sql requires some parsing because mssql doesn't output clean geojson by default
     return new Promise((resolve, reject) => {
       _.forEach(result, function (element, i) {
         combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
       })
-      console.log(combined)
+      // console.log(combined)
       combined = JSON.parse(combined)
       resolve(combined)
     })
@@ -164,24 +164,24 @@ const makeKML = function (s) {
         'marker-color': '#2C4880'
       }
 
-      replaceOptions = {
-        files: './data/KimcoSites.kml',
-        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-        to: kimcoLogo
-      }
+      // replaceOptions = {
+      //   files: './data/KimcoSites.kml',
+      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
+      //   to: kimcoLogo
+      // }
     }
 
     // console.log(sB)
 
     return new Promise((resolve, reject) => {
-      let kimcoS = _.sortBy(kimco, sB)
-
+      // let kimcoS = _.sortBy(kimco, 'SiteNo')
+      let kimcoS = kimco
       resolve(kimcoS)
     })
   }
 
   const styleIt = function (q) {
-    // console.log('STYLING')
+    console.log('STYLING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         _.assign(q[i].properties, style)
@@ -191,7 +191,7 @@ const makeKML = function (s) {
   }
 
   const descriptIt = function (q) {
-    // console.log('DESCRIPTING')
+    console.log('DESCRIPTING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -334,8 +334,8 @@ const makeRings = function (dist) {
   console.log(JSON.stringify(bufferOut))
 
   let bufferKML = tokml(bufferOut, {
-    documentName: distS + ' Kimco Site Buffer',
-    documentDescription: distS + ' Kimco Site Buffer',
+    documentName: distS + ' Mile Ring',
+    documentDescription: distS + ' Mile Ring',
     simplestyle: true,
     description: '',
     name: 'SiteNo'
@@ -423,13 +423,13 @@ new CronJob('10 23 * * * *', function () {
 let devLayer = 'KimcoSites'
 
 makeKML(devLayer)
-replace(replaceOptions)
-  .then(changedFiles => {
-    console.log('Modified files:', changedFiles.join(', '))
-  })
-  .catch(error => {
-    console.error('Error occurred:', error)
-  })
+// replace(replaceOptions)
+//   .then(changedFiles => {
+//     console.log('Modified files:', changedFiles.join(', '))
+//   })
+//   .catch(error => {
+//     console.error('Error occurred:', error)
+//   })
 
 makeRings(3)
 makeRings(5)
