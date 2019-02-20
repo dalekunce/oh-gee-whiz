@@ -25,7 +25,7 @@ const connection = new Connection(config)
 
 // set the file config for use later by find - replace
 let replaceOptions = {
-  files: 'data/KimcoSites.kml',
+  files: './data/KimcoSites.kml',
   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
   to: kimcoLogo
 }
@@ -56,6 +56,7 @@ const getData = function () {
     FORMAT(latitude, N'0.##########'))
   ) as [geometry.coordinates]
   FROM KIMprops
+  WHERE KIMprops.active = 'y'
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
@@ -163,24 +164,24 @@ const makeKML = function (s) {
         'marker-color': '#2C4880'
       }
 
-      replaceOptions = {
-        files: './data/KimcoSites.kml',
-        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-        to: kimcoLogo
-      }
+      // replaceOptions = {
+      //   files: './data/KimcoSites.kml',
+      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
+      //   to: kimcoLogo
+      // }
     }
 
     // console.log(sB)
 
     return new Promise((resolve, reject) => {
-      let kimcoS = _.sortBy(kimco, sB)
-
+      // let kimcoS = _.sortBy(kimco, 'SiteNo')
+      let kimcoS = kimco
       resolve(kimcoS)
     })
   }
 
   const styleIt = function (q) {
-    // console.log('STYLING')
+    console.log('STYLING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         _.assign(q[i].properties, style)
@@ -190,7 +191,7 @@ const makeKML = function (s) {
   }
 
   const descriptIt = function (q) {
-    // console.log('DESCRIPTING')
+    console.log('DESCRIPTING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -419,9 +420,9 @@ new CronJob('10 23 * * * *', function () {
 // ***********
 
 // getData()
-// let devLayer = 'KimcoSites'
-//
-// makeKML(devLayer)
+let devLayer = 'KimcoSites'
+
+makeKML(devLayer)
 // replace(replaceOptions)
 //   .then(changedFiles => {
 //     console.log('Modified files:', changedFiles.join(', '))
@@ -430,5 +431,5 @@ new CronJob('10 23 * * * *', function () {
 //     console.error('Error occurred:', error)
 //   })
 
-// makeRings(3)
-// makeRings(5)
+makeRings(3)
+makeRings(5)
