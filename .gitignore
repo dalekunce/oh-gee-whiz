@@ -8,6 +8,9 @@ kimco.json
 LeasingAgent.kml
 PropertyManager.kml
 KimcoSites.kml
+3_buffer.kml
+5_buffer.kml
+5_buffer.geojson
 
 # Logs #
 ######################
