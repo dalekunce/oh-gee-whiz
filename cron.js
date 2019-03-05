@@ -367,13 +367,13 @@ new CronJob('2 23 * * * *', function () {
   let logTime = new Date(tS)
   console.log('Build Leasing Agent KML ' + logTime)
   makeKML('LeasingAgent')
-  // replace(replaceOptions)
-  //   .then(changedFiles => {
-  //     console.log('Modified files:', changedFiles.join(', '))
-  //   })
-  //   .catch(error => {
-  //     console.error('Error occurred:', error)
-  //   })
+  replace(replaceOptions)
+    .then(changedFiles => {
+      console.log('Modified files:', changedFiles.join(', '))
+    })
+    .catch(error => {
+      console.error('Error occurred:', error)
+    })
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for propertymanager every night at 23:04
@@ -382,13 +382,13 @@ new CronJob('4 23 * * * *', function () {
   let logTime = new Date(tS)
   console.log('Build Property Manager KML ' + logTime)
   makeKML('PropertyManager')
-  // replace(replaceOptions)
-  //   .then(changedFiles => {
-  //     console.log('Modified files:', changedFiles.join(', '))
-  //   })
-  //   .catch(error => {
-  //     console.error('Error occurred:', error)
-  //   })
+  replace(replaceOptions)
+    .then(changedFiles => {
+      console.log('Modified files:', changedFiles.join(', '))
+    })
+    .catch(error => {
+      console.error('Error occurred:', error)
+    })
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for propertymanager every night at 23:06
@@ -419,7 +419,7 @@ new CronJob('10 23 * * * *', function () {
 // for dev use only
 // ***********
 
-// getData()
+getData()
 let devLayer = 'KimcoSites'
 
 makeKML(devLayer)
