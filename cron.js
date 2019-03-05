@@ -140,11 +140,11 @@ const makeKML = function (s) {
         'marker-symbol': 'building',
         'marker-color': '#008015'
       }
-      // replaceOptions = {
-      //   files: './data/PropertyManager.kml',
-      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-commercial+008015.png',
-      //   to: 'http://maps.google.com/mapfiles/kml/shapes/hiker.png'
-      // }
+      replaceOptions = {
+        files: './data/PropertyManager.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-commercial+008015.png',
+        to: 'http://maps.google.com/mapfiles/kml/shapes/hiker.png'
+      }
     } else if (s === 'LeasingAgent') {
       style = {
         'marker-size': 'large',
@@ -152,11 +152,11 @@ const makeKML = function (s) {
         'marker-color': '#801876'
       }
 
-      // replaceOptions = {
-      //   files: './data/LeasingAgent.kml',
-      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-camera+801876.png',
-      //   to: 'http://maps.google.com/mapfiles/kml/shapes/camera.png'
-      // }
+      replaceOptions = {
+        files: './data/LeasingAgent.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-camera+801876.png',
+        to: 'http://maps.google.com/mapfiles/kml/shapes/camera.png'
+      }
     } else if (s === 'KimcoSites') {
       style = {
         'marker-size': 'large',
@@ -164,11 +164,11 @@ const makeKML = function (s) {
         'marker-color': '#2C4880'
       }
 
-      // replaceOptions = {
-      //   files: './data/KimcoSites.kml',
-      //   from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
-      //   to: kimcoLogo
-      // }
+      replaceOptions = {
+        files: './data/KimcoSites.kml',
+        from: 'https://api.tiles.mapbox.com/v3/marker/pin-l-star+2C4880.png',
+        to: kimcoLogo
+      }
     }
 
     // console.log(sB)
@@ -423,13 +423,13 @@ new CronJob('10 23 * * * *', function () {
 let devLayer = 'KimcoSites'
 
 makeKML(devLayer)
-// replace(replaceOptions)
-//   .then(changedFiles => {
-//     console.log('Modified files:', changedFiles.join(', '))
-//   })
-//   .catch(error => {
-//     console.error('Error occurred:', error)
-//   })
+replace(replaceOptions)
+  .then(changedFiles => {
+    console.log('Modified files:', changedFiles.join(', '))
+  })
+  .catch(error => {
+    console.error('Error occurred:', error)
+  })
 
 makeRings(3)
 makeRings(5)
