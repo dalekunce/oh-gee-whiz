@@ -109,7 +109,7 @@ const getSearch = function (req, res, next) {
     WHERE (KIMprops.Name LIKE Concat('%',@qID,'%')
       OR KIMprops.LeasingAgent LIKE Concat('%',@qID,'%')
       OR KIMprops.PropertyManager LIKE Concat('%',@qID,'%')
-      AND (KIMprops.active = 'y')
+      AND (KIMprops.Active = 'Y')
     FOR JSON PATH`)
     .parameter('qID', TYPES.VarChar, sT)
     .execute()

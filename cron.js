@@ -56,7 +56,7 @@ const getData = function () {
     FORMAT(latitude, N'0.##########'))
   ) as [geometry.coordinates]
   FROM KIMprops
-  WHERE KIMprops.active = 'Y'
+  WHERE KIMprops.Active = 'Y'
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
