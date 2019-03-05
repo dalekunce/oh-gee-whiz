@@ -106,10 +106,9 @@ const getSearch = function (req, res, next) {
       FORMAT(latitude, N'0.##########'))
     ) as [geometry.coordinates]
     FROM KIMprops
-    WHERE (KIMprops.Name LIKE Concat('%',@qID,'%')
+    WHERE KIMprops.Name LIKE Concat('%',@qID,'%')
       OR KIMprops.LeasingAgent LIKE Concat('%',@qID,'%')
       OR KIMprops.PropertyManager LIKE Concat('%',@qID,'%')
-      AND (KIMprops.Active = 'Y')
     FOR JSON PATH`)
     .parameter('qID', TYPES.VarChar, sT)
     .execute()

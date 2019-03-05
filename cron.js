@@ -56,7 +56,6 @@ const getData = function () {
     FORMAT(latitude, N'0.##########'))
   ) as [geometry.coordinates]
   FROM KIMprops
-  WHERE KIMprops.Active = 'Y'
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
@@ -191,7 +190,7 @@ const makeKML = function (s) {
   }
 
   const descriptIt = function (q) {
-    console.log('DESCRIPTING')
+    console.log('DESCRIPTING2')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -416,7 +415,7 @@ new CronJob('10 23 * * * *', function () {
 }, null, true, 'America/Los_Angeles')
 
 // ***********
-// for dev use only
+// for dev/startup use only
 // ***********
 
 getData()
@@ -431,5 +430,5 @@ replace(replaceOptions)
     console.error('Error occurred:', error)
   })
 
-makeRings(3)
-makeRings(5)
+setTimeout(makeRings(3), 10000)
+setTimeout(makeRings(5), 12000)
