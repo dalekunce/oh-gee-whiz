@@ -56,7 +56,8 @@ const getData = function () {
     FORMAT(latitude, N'0.##########'))
   ) as [geometry.coordinates]
   FROM KIMprops
-  FOR JSON PATH`)
+  FOR JSON PATH
+  WHERE KIMprops.active = 'Y'`)
   .execute()
   .then(function (result, rowCount) {
     // console.log(result)
@@ -429,6 +430,3 @@ replace(replaceOptions)
   .catch(error => {
     console.error('Error occurred:', error)
   })
-
-setTimeout(makeRings(3), 10000)
-setTimeout(makeRings(5), 12000)
