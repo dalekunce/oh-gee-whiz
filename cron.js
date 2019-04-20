@@ -57,6 +57,8 @@ const getData = function () {
   ) as [geometry.coordinates]
   FROM KIMprops
   WHERE KIMprops.active = 'Y'
+    AND KIMprops.latitude IS NOT NULL
+    AND KIMprops.longitude IS NOT NULL
   FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
