@@ -119,7 +119,7 @@ const getData = function () {
         if (err) {
           return console.log(err)
         } else {
-          console.log('The file was saved')
+          console.log('Saved kimco.json')
         }
       })
       resolve(d2)
