@@ -60,7 +60,7 @@ const getData = function () {
   WHERE KIMprops.active = 'Y'
     AND KIMprops.latitude IS NOT NULL
     AND KIMprops.longitude IS NOT NULL
-  FOR JSON PATH`)
+  FOR JSON PATH, INCLUDE_NULL_VALUES`)
   .execute()
   .then(function (result, rowCount) {
     // console.log(result)
@@ -234,7 +234,7 @@ const makeKML = function (s) {
   }
 
   const geofyIt = function (q) {
-    // console.log('GEOFYING')
+    console.log('GEOFYING')
     let q1 = {
       type: 'FeatureCollection',
       'features':
@@ -422,14 +422,14 @@ new CronJob('10 23 * * * *', function () {
 // for dev/startup use only
 // ***********
 
-getData()
+// getData()
 let devLayer = 'KimcoSites'
 
 makeKML(devLayer)
-replace(replaceOptions)
-  .then(changedFiles => {
-    console.log('Modified files:', changedFiles.join(', '))
-  })
-  .catch(error => {
-    console.error('Error occurred:', error)
-  })
+// replace(replaceOptions)
+//   .then(changedFiles => {
+//     console.log('Modified files:', changedFiles.join(', '))
+//   })
+//   .catch(error => {
+//     console.error('Error occurred:', error)
+//   })
