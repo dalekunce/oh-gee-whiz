@@ -31,6 +31,7 @@ let replaceOptions = {
 }
 
 const getData = function () {
+  console.log('Getting Data')
   tp.sql(`SELECT
     'Feature' AS type,
     SiteNo as id,
@@ -74,7 +75,7 @@ const getData = function () {
       resolve(combined)
     })
   }).then(function (q) {
-    console.log('DESCRIPTING')
+    console.log('Description in JSON')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -287,10 +288,10 @@ const makeKML = function (s) {
     let q = styleIt(result)
     return q
   })
-  .then(function (result) {
-    let q = descriptIt(result)
-    return q
-  })
+  // .then(function (result) {
+  //   let q = descriptIt(result)
+  //   return q
+  // })
   .then(function (result) {
     let q = geofyIt(result)
     return q
