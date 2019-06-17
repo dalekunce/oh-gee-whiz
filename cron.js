@@ -61,7 +61,7 @@ const getData = function () {
   WHERE KIMprops.active = 'Y'
     AND KIMprops.latitude IS NOT NULL
     AND KIMprops.longitude IS NOT NULL
-  FOR JSON PATH, INCLUDE_NULL_VALUES`)
+  FOR JSON PATH`)
   .execute()
   .then(function (result, rowCount) {
     // console.log(result)
