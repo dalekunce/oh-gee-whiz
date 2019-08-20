@@ -119,7 +119,6 @@ const getSearch = function (req, res, next) {
     .then(function (result, rowCount) {
       let combined = ''
       // sql requires some parsing because mssql doesn't output clean geojson by default
-      // const features = result[0]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
       return new Promise((resolve, reject) => {
         _.forEach(result, function (element, i) {
           combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
@@ -146,7 +145,7 @@ const getSearch = function (req, res, next) {
             '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
-            '<b>Overlay Site Plan:</b> <a href="n:/aedept/overlays/' + q[i].properties.SiteLink + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+            '<b>Overlay Site Plan:</b> <a href="file:///n:/aedept/overlays/' + q[i].properties.SiteLink + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
             '<hr />' +
             '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
             '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
