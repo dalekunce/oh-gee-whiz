@@ -48,12 +48,12 @@ const statusUpdate = function (req, res, next) {
     'content-type': 'application/json'
   })
 
-  const testQuery = new Request(`Select * FROM KIMprops`, function (err, rowCount, rows) {
+  const testQuery = new Request(`Select * FROM KIMprops WHERE active='Y'`, function (err, rowCount, rows) {
     if (err) {
       result.dbstatus = err
       console.log('ERROR DB')
     } if (rowCount >= 1) {
-      result.dbstatus = 'Connected'
+      result.dbstatus = 'Connected' + 'Rows Returned: ' + rowCount
       console.log('Connected to ' + config.server + 'Rows Returned: ' + rowCount)
     } else {
       result.dbstatus = 'Connected but no data'
