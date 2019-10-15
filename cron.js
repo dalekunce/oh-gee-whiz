@@ -423,7 +423,7 @@ new CronJob('10 23 * * * *', function () {
 // for dev/startup use only
 // ***********
 
-// getData()
+getData()
 let devLayer = 'KimcoSites'
 
 makeKML(devLayer)

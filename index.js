@@ -53,7 +53,7 @@ const statusUpdate = function (req, res, next) {
       result.dbstatus = err
       console.log('ERROR DB')
     } if (rowCount >= 1) {
-      result.dbstatus = 'Connected' + 'Rows Returned: ' + rowCount
+      result.dbstatus = 'Connected - ' + 'Active Sites: ' + rowCount
       console.log('Connected to ' + config.server + 'Rows Returned: ' + rowCount)
     } else {
       result.dbstatus = 'Connected but no data'
