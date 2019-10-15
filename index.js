@@ -9,6 +9,8 @@ const fs = require('fs')
 
 // test data to make sure everything parses
 const testJSON = require('./data/test.json')
+
+// must have files to make stuff work
 const kimco = require('./data/kimco.json')
 const kimcoLogo = 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
 
@@ -52,7 +54,7 @@ const statusUpdate = function (req, res, next) {
       console.log('ERROR DB')
     } if (rowCount >= 1) {
       result.dbstatus = 'Connected'
-      console.log('Connected to ' + config.server)
+      console.log('Connected to ' + config.server + 'Rows Returned: ' + rowCount)
     } else {
       result.dbstatus = 'Connected but no data'
       console.log('Connected to ' + config.server + ' but no data')
