@@ -11,7 +11,7 @@ const turf = require('@turf/turf')
 
 tp.setConnectionConfig(config) // global scope
 
-// set the base kml to use - makes things faster to use a local file
+// set the base json to use - makes things faster to use a local file get refreshed every cron run
 const kimco = require('./data/kimco.json')
 const kimcoLogo = 'http://gee-app.kimcorealty.com:3000/data/kimco_logo_2018.png'
 
@@ -71,7 +71,6 @@ const getData = function () {
       _.forEach(result, function (element, i) {
         combined += result[i]['JSON_F52E2B61-18A1-11d1-B105-00805F49916B']
       })
-      // console.log(combined)
       combined = JSON.parse(combined)
       resolve(combined)
     })
@@ -116,6 +115,7 @@ const getData = function () {
     let d2 = JSON.stringify(d1, null, 2)
 
     return new Promise((resolve, reject) => {
+      // make the base file to run everything against
       fs.writeFile('./data/kimco.json', d2, function (err) {
         if (err) {
           return console.log(err)
@@ -178,7 +178,6 @@ const makeKML = function (s) {
     // console.log(sB)
 
     return new Promise((resolve, reject) => {
-      // let kimcoS = _.sortBy(kimco, 'SiteNo')
       let kimcoS = kimco
       resolve(kimcoS)
     })
@@ -283,7 +282,6 @@ const makeKML = function (s) {
     })
   }
 
-  // let we = Promise.all(
   e(sB)
   .then(function (result) {
     let q = styleIt(result)
@@ -423,14 +421,14 @@ new CronJob('10 23 * * * *', function () {
 // for dev/startup use only
 // ***********
 
-getData()
-let devLayer = 'KimcoSites'
-
-makeKML(devLayer)
-replace(replaceOptions)
-  .then(changedFiles => {
-    console.log('Modified files:', changedFiles.join(', '))
-  })
-  .catch(error => {
-    console.error('Error occurred:', error)
-  })
+// getData()
+// let devLayer = 'KimcoSites'
+//
+// makeKML(devLayer)
+// replace(replaceOptions)
+//   .then(changedFiles => {
+//     console.log('Modified files:', changedFiles.join(', '))
+//   })
+//   .catch(error => {
+//     console.error('Error occurred:', error)
+//   })
