@@ -90,7 +90,6 @@ const getSearch = function (req, res, next) {
       PropertyManager as PropertyManager,
       Name as [properties.Name],
       SiteNo as [properties.SiteNo],
-      LEFT(SiteNo,4) as [properties.SiteLink],
       PropertyManager as [properties.PropertyManager],
       LeasingAgent as [properties.LeasingAgent],
       CenterName as [properties.CenterName],
@@ -109,6 +108,7 @@ const getSearch = function (req, res, next) {
     ) as [geometry.coordinates]
     FROM KIMprops
     WHERE (KIMprops.Name LIKE Concat('%',@qID,'%')
+      OR KIMprops.SiteNo LIKE Concat('%',@qID,'%')
       OR KIMprops.LeasingAgent LIKE Concat('%',@qID,'%')
       OR KIMprops.PropertyManager LIKE Concat('%',@qID,'%'))
       AND KIMprops.active = 'Y'
@@ -146,7 +146,7 @@ const getSearch = function (req, res, next) {
             '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
             '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
             '<hr />' +
-            '<b>Overlay Site Plan:</b> <a href="file:///n:/aedept/overlays/' + q[i].properties.SiteLink + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+            '<b>Overlay Site Plan:</b> <a href="file:///n:/aedept/overlays/' + q[i].properties.SiteNo + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
             '<hr />' +
             '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
             '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +
@@ -276,7 +276,7 @@ function getSorted (req, res, next) {
           '<hr /><b>Link to Web Site:</b> <br /><a href="' + q[i].properties.LinkToWebsite + '" target="asset"> ' + q[i].properties.LinkToWebsite + '</a>' +
           '<hr /><b>Marketing Brochure:</b> <br /><a href="' + q[i].properties.MarketingBrochure + '" target="asset">' + q[i].properties.MarketingBrochure + '</a>' +
           '<hr />' +
-          '<b>Overlay Site Plan:</b> <a href="file:///n:/aedept/overlays/' + q[i].properties.SiteLink + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
+          '<b>Overlay Site Plan:</b> <a href="file:///n:/aedept/overlays/' + q[i].properties.SiteNo + '_overlay.kml" target="asset">Click to see ' + q[i].properties.SiteNo + ' site plan</a><br />' +
           '<hr />' +
           '<b>Property Manager:</b> ' + q[i].properties.PropertyManager + '<br />' +
           '<b>Leasing Agent:</b> ' + q[i].properties.LeasingAgent + '<br />' +

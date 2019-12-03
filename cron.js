@@ -39,7 +39,6 @@ const getData = function () {
     PropertyManager as PropertyManager,
     Name as [properties.Name],
     SiteNo as [properties.SiteNo],
-    LEFT(SiteNo,4) as [properties.SiteLink],
     PropertyManager as [properties.PropertyManager],
     LeasingAgent as [properties.LeasingAgent],
     CenterName as [properties.CenterName],
