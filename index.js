@@ -100,7 +100,6 @@ const getSearch = function (req, res, next) {
       Partnership as [properties.Partnership],
       MarketingBrochure as [properties.MarketingBrochure],
       LinkToWebsite as [properties.LinkToWebsite],
-      LinkToOverlay as [properties.LinkToOverlay],
       Participation as [properties.Participation],
       'Point' as [geometry.type],
       JSON_QUERY
