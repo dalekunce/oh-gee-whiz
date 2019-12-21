@@ -326,7 +326,8 @@ const makeRings = function (dist) {
     kimco[i].properties = {}
     kimco[i].properties.SiteNo = sN
     _.assign(kimco[i].properties, style)
-    let buff = turf.buffer((kimco[i]), dist, {units: 'miles'})
+    // let buff = turf.buffer((kimco[i]), dist, {units: 'miles'})
+    let buff = turf.circle((kimco[i]), dist, {steps: 64, units: 'miles'})
     bufferList.push(buff)
   })
   console.log(bufferList)
