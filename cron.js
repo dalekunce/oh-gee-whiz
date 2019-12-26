@@ -31,7 +31,7 @@ let replaceOptions = {
 }
 
 const getData = function () {
-  console.log('Getting Data')
+  // console.log('Getting Data')
   tp.sql(`SELECT
     'Feature' AS type,
     SiteNo as id,
@@ -73,7 +73,7 @@ const getData = function () {
       resolve(combined)
     })
   }).then(function (q) {
-    console.log('Description in JSON')
+    // console.log('Description in JSON')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -118,7 +118,7 @@ const getData = function () {
         if (err) {
           return console.log(err)
         } else {
-          console.log('Saved kimco.json')
+          // console.log('Saved kimco.json')
         }
       })
       resolve(d2)
@@ -182,7 +182,7 @@ const makeKML = function (s) {
   }
 
   const styleIt = function (q) {
-    console.log('STYLING')
+    // console.log('STYLING')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         _.assign(q[i].properties, style)
@@ -192,7 +192,7 @@ const makeKML = function (s) {
   }
 
   const descriptIt = function (q) {
-    console.log('DESCRIPTING2')
+    // console.log('DESCRIPTING2')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -232,7 +232,7 @@ const makeKML = function (s) {
   }
 
   const geofyIt = function (q) {
-    console.log('GEOFYING')
+    // console.log('GEOFYING')
     let q1 = {
       type: 'FeatureCollection',
       'features':
@@ -273,7 +273,7 @@ const makeKML = function (s) {
         if (err) {
           return console.log(err)
         } else {
-          console.log(sB + ' KML saved')
+          // console.log(sB + ' KML saved')
         }
       })
       resolve(dKML)
@@ -304,9 +304,9 @@ const makeKML = function (s) {
 // make the 3 and 5 mile property rings
 const makeRings = function (dist) {
   let distS = dist.toString()
-  console.log('Making a ' + distS + ' mile buffer KML')
+  // console.log('Making a ' + distS + ' mile buffer KML')
   // let points = JSON.parse(fs.readFileSync(kimco)).features
-  console.log(kimco)
+  // console.log(kimco)
   let style = {
     'stroke-opacity': 0.8,
     'stroke-width': 3,
@@ -330,9 +330,9 @@ const makeRings = function (dist) {
     let buff = turf.circle((kimco[i]), dist, {steps: 64, units: 'miles'})
     bufferList.push(buff)
   })
-  console.log(bufferList)
+  // console.log(bufferList)
   let bufferOut = turf.featureCollection(bufferList)
-  console.log(JSON.stringify(bufferOut))
+  // console.log(JSON.stringify(bufferOut))
 
   let bufferKML = tokml(bufferOut, {
     documentName: distS + ' Mile Ring',
@@ -347,7 +347,7 @@ const makeRings = function (dist) {
       if (err) {
         return console.log(err)
       } else {
-        console.log(distS + ' KML saved')
+        // console.log(distS + ' KML saved')
       }
     })
     resolve(bufferKML)
@@ -358,7 +358,7 @@ const makeRings = function (dist) {
 new CronJob('0 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  console.log('Daily Data Get ' + logTime)
+  // console.log('Daily Data Get ' + logTime)
   getData()
 }, null, true, 'America/Los_Angeles')
 
@@ -366,11 +366,11 @@ new CronJob('0 23 * * * *', function () {
 new CronJob('2 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  console.log('Build Leasing Agent KML ' + logTime)
+  // console.log('Build Leasing Agent KML ' + logTime)
   makeKML('LeasingAgent')
   replace(replaceOptions)
     .then(changedFiles => {
-      console.log('Modified files:', changedFiles.join(', '))
+      // console.log('Modified files:', changedFiles.join(', '))
     })
     .catch(error => {
       console.error('Error occurred:', error)
@@ -381,11 +381,11 @@ new CronJob('2 23 * * * *', function () {
 new CronJob('4 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  console.log('Build Property Manager KML ' + logTime)
+  // console.log('Build Property Manager KML ' + logTime)
   makeKML('PropertyManager')
   replace(replaceOptions)
     .then(changedFiles => {
-      console.log('Modified files:', changedFiles.join(', '))
+      // console.log('Modified files:', changedFiles.join(', '))
     })
     .catch(error => {
       console.error('Error occurred:', error)
@@ -396,7 +396,7 @@ new CronJob('4 23 * * * *', function () {
 new CronJob('6 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  console.log('Build Kimco Sites ' + logTime)
+  // console.log('Build Kimco Sites ' + logTime)
   makeKML('KimcoSites')
   replace(replaceOptions)
     .then(changedFiles => {
@@ -411,7 +411,7 @@ new CronJob('6 23 * * * *', function () {
 new CronJob('10 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  console.log('Build Buffer ' + logTime)
+  // console.log('Build Buffer ' + logTime)
   makeRings(3)
   makeRings(5)
 }, null, true, 'America/Los_Angeles')

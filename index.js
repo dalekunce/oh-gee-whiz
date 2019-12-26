@@ -212,7 +212,7 @@ function getSorted (req, res, next) {
   let style = {}
 
   const e = function (s) {
-    console.log('SORTING')
+    // console.log('SORTING')
     // sort the layer for the intended style gets replaced for static kml files in cron.js this is only temporary
     if (s === 'PropertyManager') {
       style = {
@@ -235,7 +235,7 @@ function getSorted (req, res, next) {
       sB = 'SiteNo' // override for bad uri path
     }
 
-    console.log(sB)
+    // console.log(sB)
 
     // let kimcoS = kimco
 
@@ -326,7 +326,7 @@ function getSorted (req, res, next) {
         if (err) {
           return console.log(err)
         } else {
-          console.log('The file was saved')
+          // console.log('The file was saved')
         }
       })
       resolve(dKML)
