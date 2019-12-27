@@ -420,14 +420,17 @@ new CronJob('10 23 * * * *', function () {
 // for dev/startup use only
 // ***********
 
-// getData()
-// let devLayer = 'KimcoSites'
-//
-// makeKML(devLayer)
-// replace(replaceOptions)
-//   .then(changedFiles => {
-//     console.log('Modified files:', changedFiles.join(', '))
-//   })
-//   .catch(error => {
-//     console.error('Error occurred:', error)
-//   })
+getData()
+let devLayer = 'KimcoSites'
+
+makeKML(devLayer)
+replace(replaceOptions)
+  .then(changedFiles => {
+    console.log('Modified files:', changedFiles.join(', '))
+  })
+  .catch(error => {
+    console.error('Error occurred:', error)
+  })
+
+makeRings(3)
+makeRings(5)
