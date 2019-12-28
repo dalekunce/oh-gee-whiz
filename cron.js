@@ -73,7 +73,7 @@ const getData = function () {
       resolve(combined)
     })
   }).then(function (q) {
-    // console.log('Description in JSON')
+    console.log('Description in JSON')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -192,7 +192,7 @@ const makeKML = function (s) {
   }
 
   const descriptIt = function (q) {
-    // console.log('DESCRIPTING2')
+    console.log('DESCRIPTING2')
     return new Promise((resolve, reject) => {
       _.forEach(q, function (element, i) {
         // set description for later use by tokml
@@ -253,7 +253,7 @@ const makeKML = function (s) {
       dKML = tokml(q4, {
         documentName: 'Kimco Sites',
         documentDescription: 'Kimco Sites',
-        simplestyle: true,
+        simplestyle: true, // important!
         description: 'Description',
         name: 'SiteNo'
       })
@@ -262,7 +262,7 @@ const makeKML = function (s) {
       dKML = tokml(q4, {
         documentName: sB,
         documentDescription: sB,
-        simplestyle: true,
+        simplestyle: true, // important!
         description: 'Description',
         name: 'SiteNo'
       })
@@ -358,49 +358,26 @@ const makeRings = function (dist) {
 new CronJob('0 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  // console.log('Daily Data Get ' + logTime)
+  console.log('GET ' + logTime)
   getData()
 }, null, true, 'America/Los_Angeles')
 
-// make the KML for leasingagent every night at 23:02
+// make the KML for kimcosites every night at 23:02
 new CronJob('2 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  // console.log('Build Leasing Agent KML ' + logTime)
-  makeKML('LeasingAgent')
-  replace(replaceOptions)
-    .then(changedFiles => {
-      // console.log('Modified files:', changedFiles.join(', '))
-    })
-    .catch(error => {
-      console.error('Error occurred:', error)
-    })
+  console.log('MAKE ' + logTime)
+  makeKML('KimcoSites')
 }, null, true, 'America/Los_Angeles')
 
-// make the KML for propertymanager every night at 23:04
-new CronJob('4 23 * * * *', function () {
-  let tS = Number(new Date())
-  let logTime = new Date(tS)
-  // console.log('Build Property Manager KML ' + logTime)
-  makeKML('PropertyManager')
-  replace(replaceOptions)
-    .then(changedFiles => {
-      // console.log('Modified files:', changedFiles.join(', '))
-    })
-    .catch(error => {
-      console.error('Error occurred:', error)
-    })
-}, null, true, 'America/Los_Angeles')
-
-// make the KML for propertymanager every night at 23:06
+// Replace the icons every night at 23:06
 new CronJob('6 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  // console.log('Build Kimco Sites ' + logTime)
-  makeKML('KimcoSites')
+  console.log('FIX ' + logTime)
   replace(replaceOptions)
     .then(changedFiles => {
-      console.log('Modified files:', changedFiles.join(', '))
+      console.log('Fixed:', changedFiles.join(', '))
     })
     .catch(error => {
       console.error('Error occurred:', error)
@@ -411,7 +388,7 @@ new CronJob('6 23 * * * *', function () {
 new CronJob('10 23 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
-  // console.log('Build Buffer ' + logTime)
+  console.log('BUFFER ' + logTime)
   makeRings(3)
   makeRings(5)
 }, null, true, 'America/Los_Angeles')
@@ -420,17 +397,17 @@ new CronJob('10 23 * * * *', function () {
 // for dev/startup use only
 // ***********
 
-getData()
-let devLayer = 'KimcoSites'
+// getData()
+// let devLayer = 'KimcoSites'
 
-makeKML(devLayer)
-replace(replaceOptions)
-  .then(changedFiles => {
-    console.log('Modified files:', changedFiles.join(', '))
-  })
-  .catch(error => {
-    console.error('Error occurred:', error)
-  })
+// makeKML(devLayer)
+// replace(replaceOptions)
+//   .then(changedFiles => {
+//     console.log('Modified files:', changedFiles.join(', '))
+//   })
+//   .catch(error => {
+//     console.error('Error occurred:', error)
+//   })
 
-makeRings(3)
-makeRings(5)
+// makeRings(3)
+// makeRings(5)
