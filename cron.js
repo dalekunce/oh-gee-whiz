@@ -363,7 +363,7 @@ new CronJob('0 23 * * * *', function () {
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for kimcosites every night at 23:02
-new CronJob('2 23 * * * *', function () {
+new CronJob('0 25 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('MAKE ' + logTime)
@@ -371,7 +371,7 @@ new CronJob('2 23 * * * *', function () {
 }, null, true, 'America/Los_Angeles')
 
 // Replace the icons every night at 23:06
-new CronJob('6 23 * * * *', function () {
+new CronJob('0 27 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('FIX ' + logTime)
@@ -385,7 +385,7 @@ new CronJob('6 23 * * * *', function () {
 }, null, true, 'America/Los_Angeles')
 
 // make the KML for kimco site buffers every night at 23:10
-new CronJob('10 23 * * * *', function () {
+new CronJob('0 30 * * * *', function () {
   let tS = Number(new Date())
   let logTime = new Date(tS)
   console.log('BUFFER ' + logTime)
