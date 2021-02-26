@@ -1,10 +1,10 @@
 # Oh GEE Whiz
 
-This application/api is a standalone node.js app that talks to a MSSQL database via tedious and tedious promises and returns KML and GeoJSON for a given valid SQL query.
+This application/api is a standalone node.js app that talks to a MSSQL database via tedious and tedious promises and returns KML and GeoJSON for a given valid SQL query. 
 
 ## Install Application
 
-Edit the credentials and settings in `config_examples.json` and save as `config.json` in the root directory of the application.
+Edit the database credentials and settings in `config_examples.json` and save as `config.json` in the root directory of the application.
 
 ``` json
 {
